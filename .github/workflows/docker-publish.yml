@@ -140,6 +140,12 @@ jobs:
       - build
     steps:
 
+      # Docker is terrible and doesn't like uppercase image names.
+      - name: Lowercase image name
+        run: |
+          IMAGE_NAME=$(echo ${IMAGE_NAME} | tr A-Z a-z)
+          echo "IMAGE_NAME=${IMAGE_NAME}" >> "${GITHUB_ENV}"
+
       - name: Download digests
         uses: actions/download-artifact@v4
         with:
