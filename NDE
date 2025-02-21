@@ -37,6 +37,8 @@ begin
 
 	using SparseArrays
 
+	using LaTeXStrings
+
 	plotlyjs()
 
 	md"""
@@ -457,7 +459,6 @@ plot(0:0.05:tend,
      [t -> y(t, 0)], # y 
      label="y(t)= (A/ω) sin(ωt)",
      legend=:topright,
-	 # legend_columns=-1,
      title=" ",
      xlabel="t",
      ylabel="y",
@@ -509,7 +510,7 @@ end;
 let 
 plot(0:0.05:tend_exp, 
      [t -> f_exp(t, 1)], # y 
-     label="f(t) = y0 e^-t",
+     label="f(t) = y0 e^{-t}",
      legend=:topright,
 	 # legend_columns=-1,
      title=" ",
@@ -869,10 +870,10 @@ end;
 
 # ╔═╡ 80475362-e5cb-4a68-a62f-bac869b9ff30
 begin
-		# Plot results
-		plot(x, u0_adv, label="Initial", linestyle=:dash, linewidth=2,xlabel="space", ylabel="velocity", title="Advection equation")
-		plot!(x, u_up[:,end], label="Backward Difference", linewidth=2)
-		#plot!(x, u_cen[:,end], label="Central Difference", linewidth=2)
+	# Plot results
+	plot(x, u0_adv, label="Initial", linestyle=:dash, linewidth=2,xlabel="space", ylabel="velocity", title="Advection equation")
+	plot!(x, u_up[:,end], label="Backward Difference", linewidth=3)
+	plot!(x, u_cen[:,end], label="Central Difference", linewidth=2)
 end
 
 # ╔═╡ 02d31381-72bd-41c3-a675-367d9f04c7ea
@@ -916,6 +917,7 @@ end
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 NLsolve = "2774e3e8-f4cf-5e23-947b-6d7e65073b56"
 PlotlyBase = "a03496cd-edff-5a9b-9e67-9cda94a718b5"
@@ -927,6 +929,7 @@ SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 TikzPictures = "37f6aa50-8035-52d0-81c2-5a1d08754b2d"
 
 [compat]
+LaTeXStrings = "~1.4.0"
 NLsolve = "~4.5.1"
 PlotlyBase = "~0.8.19"
 PlotlyJS = "~0.18.15"
@@ -942,7 +945,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.2"
 manifest_format = "2.0"
-project_hash = "24bec8f193f3a48e755dd170758eaf5606e4ea73"
+project_hash = "2c764e40a38b72e46a91a9a10a2371401aac25dd"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
