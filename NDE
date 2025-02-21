@@ -225,8 +225,8 @@ plot(0:0.05:tend,
      label=["y'(t)" "y(t)"],
      legend=:topright,
      title="y(t) = (A/ω) sin(ωt)",
-     xlabel="time",
-     ylabel=" ",
+     xlabel="t",
+     ylabel="y",
      color=[:blue :orange],
      linewidth=2,
      markershape=:circle)
@@ -253,7 +253,7 @@ plot(0:0.05:tend,
      legend=:topright,
 	 legend_columns=-1,
      title="y(t) = (A/ω)*sin(ωt)",
-     xlabel="time",
+     xlabel="t",
      ylabel="y",
      color=[:blue :orange],
      linewidth=2,
@@ -338,9 +338,9 @@ function backward_euler(f, t0, tend, y0, n)
 
     for i in 1:n
 		t[i+1] = t[i] + dt
-        # Define the algebraic function for finding y_next
+        # Define the non-linear function for finding y_next
         funk(y_next) = y_next - y[i] - dt * f(t[i+1], y_next)
-		# Find the roots to the non-linear algebraic function
+		# Find the roots to the non-linear function
 		sol = nlsolve(x -> funk(x[1]), [y[i]], method = :newton)
 		# Update y[i+1]
         y[i+1] = sol.zero[1]
@@ -372,35 +372,40 @@ TikzPicture(L"""
 \draw[<->, line width=1mm] (0, -0.2) -- (1, -0.2) node[midway, below, font=\LARGE] {$\Delta t$};
 \draw[<->, line width=1mm] (1, -0.2) -- (2, -0.2) node[midway, below, font=\LARGE] {$\Delta t$};
 
+% Tangent lines for Midpoint Method
+% Slope at t0
+\draw[dashed, red, line width=1mm] (-0.5, 0.625) -- (2.5, 2.125) node[right, font=\LARGE] {slope = $f(t_1/2, y_1/2)$};
+% Slope at midpoint t1_mid
+%\coordinate (t1_mid) at (1.0, 1.25); % Midpoint t_{1}, y_{mid}
+\draw[dashed, green, line width=1mm] (0.08333, 0) -- (2.0833, 3) node[right, font=\LARGE] {slope = $f(t_{3/2}, y_{3/2})$};
+
 % Curve y(t)
-\draw[thick, blue, domain=0:2.5, smooth, variable=\t, line width=1mm] plot ({\t}, {0.5*\t^2 + 1}) node[above right, xshift=3pt, yshift=6pt, font=\fontsize{20}{25}] {$y(t)$};
+\draw[thick, blue, domain=0:2, smooth, variable=\t, line width=1mm] plot ({\t}, {0.5*\t^2 + 1}) node[above right, xshift=3pt, yshift=6pt, font=\fontsize{20}{25}] {$y(t)$};
 
 % Points
 \coordinate (t0) at (0.0, 1.0);       % t_0, y_0
 \coordinate (t1_curve) at (1.0, 1.5); % Analytic t_{1}, y_{1}
-\coordinate (t1_euler) at (1.0, 2.0); % BE t_{1}, y_{1}
+\coordinate (t05_curve) at (0.5, 1.125); % Analytic t_{0.5}, y_{0.5}
+\coordinate (t1_mid) at (1, 1.5); % Midpoint estimate t_{1/2}, y_{1/2}
 \coordinate (t2_curve) at (2.0, 3.0); % Analytic t_{2}, y_{2}
-\coordinate (t2_euler) at (2.0, 4.0); % BE t_{2}, y_{2}
+\coordinate (t2_mid) at (2, 3); % Midpoint estimate t_{2/2}, y_{2/2}
+\coordinate (t15_curve) at (1.5, 2.125); % Analytic t_{1.5}, y_{1.5}
 
-% Tangent lines for Backward Euler
-% Slope at t1
-\draw[dashed, red, line width=1mm] (0, 0.5) -- (2.5, 3.0) node[above right, font=\LARGE] {slope = $f(t_{1}, y_{1})$};
-% Slope at t2
-\draw[dashed, green, line width=1mm] (0.5, 0) -- (2.5, 4.0) node[above right, font=\LARGE] {slope = $f(t_{2}, y_{2})$};
-
-% Euler step arrows for Backward Euler
-\draw[->, thick, line width=1.2mm] (t0) -- (t1_euler);
-\draw[->, thick, line width=1.2mm, black] (t1_euler) -- (t2_euler);
+% Midpoint step arrows
+\draw[->, thick, line width=1.2mm] (t0) -- (t1_mid);
+\draw[->, thick, line width=1.2mm, black] (t1_mid) -- (t2_mid);
 
 % Error lines
-\draw[dashed, gray, line width=1mm] (t1_euler) -- (t1_curve) node at (1.08, 1.8) {\LARGE $\epsilon_{t_1}$};
-\draw[dashed, gray, line width=1mm] (t2_euler) -- (t2_curve) node at (2.08, 2.7) {\LARGE $\epsilon_{t_2}$};
+% \draw[dashed, gray, line width=1mm] (t1_mid) -- (t1_curve) node at (1.08, 1.3) {\LARGE $\epsilon_{t_1}$};
+% \draw[dashed, gray, line width=1mm] (t2_mid) -- (t2_curve) node at (2.08, 2.5) {\LARGE $\epsilon_{t_2}$};
 
 \fill[black] (t0) circle (2pt) node[below left, yshift=-6pt, font=\LARGE] {$t_0, y_0$};
-\fill[red] (t1_euler) circle (2pt) node[below right, yshift=-6pt, font=\LARGE] {$t_{1}, \hat{y_{1}}$};
 \fill[black] (t1_curve) circle (2pt) node[above left, xshift=-6pt, font=\LARGE] {$t_{1}, y_{1}$};
-\fill[red] (t2_euler) circle (2pt) node[below right, yshift=-6pt, font=\LARGE] {\LARGE $t_{2}, \hat{y_{2}}$};
+\fill[red] (t1_mid) circle (2pt) node[below right, yshift=-6pt, font=\LARGE] {$t_{1}, \hat{y_{1}}$};
 \fill[black] (t2_curve) circle (2pt) node[above left, xshift=-8pt, font=\LARGE] {$t_{2}, y_{2}$};
+\fill[red] (t2_mid) circle (2pt) node[below right, yshift=-6pt, font=\LARGE] {\LARGE $t_{2}, \hat{y_{2}}$};
+\fill[black] (t05_curve) circle (1.5pt) node[below, xshift=-2pt, yshift=-3pt, font=\LARGE] {$t_{0.5}, y_{0.5}$};
+\fill[black] (t15_curve) circle (1.5pt) node[right, yshift=-12pt, font=\LARGE] {$t_{1.5}, y_{1.5}$};
 
 """, options="scale=5.0", preamble="")
 
@@ -430,6 +435,7 @@ end;
 
 # ╔═╡ dcdb7a33-ada9-4cce-9d31-a03c37681747
 md"""
+### Comparing the methods
 Now that we have all three methods defined, lets compare how they work using the sinusoidal function we used to inspect the Euler method.
 """
 
@@ -453,8 +459,8 @@ plot(0:0.05:tend,
      legend=:topright,
 	 # legend_columns=-1,
      title="y(t) = = (A/ω)*sin(ωt)",
-     xlabel="time",
-     ylabel=" ",
+     xlabel="t",
+     ylabel="y",
      color=[:blue :orange],
      linewidth=2,
      markershape=:circle)
@@ -487,7 +493,7 @@ f_exp(t, y0) = y0 * exp(-t);
 
 # ╔═╡ f8279035-637f-4991-9947-13d5cf02b83b
 # New slider for number of steps
-@bind n_exp Slider(2:1:50, show_value=true, default=9)
+@bind n_exp Slider(2:1:50, show_value=true, default=15)
 
 # ╔═╡ ab1d6667-a57f-4d6c-a8e1-6a2e470c58d9
 begin
@@ -507,8 +513,8 @@ plot(0:0.05:tend_exp,
      legend=:topright,
 	 # legend_columns=-1,
      title="f(t) = y0 e^-2t",
-     xlabel="time",
-     ylabel=" ",
+     xlabel="t",
+     ylabel="y",
      color=:blue,
      linewidth=2,
      markershape=:circle)
@@ -601,8 +607,7 @@ begin
 	u_em = y_sim[2, :]
 	
 	# Plot results
-	plot(0:0.05:tend, [t -> x_exact.(t, x0_osc, u0_osc), t -> u_exact.(t, u0_osc)], linewidth=2,
-     markershape=:circle, label=["x(t) (exact)" "u(t) (exact)"], color=[:blue :orange])
+	plot(0:0.05:tend, [t -> x_exact.(t, x0_osc, u0_osc), t -> u_exact.(t, u0_osc)], linewidth=2,markershape=:circle, label=["x(t) (exact)" "u(t) (exact)"], color=[:blue :orange],xlabel="t", ylabel="y",title="y''(t) = = -sin(ωt)")
 	plot!(t_sim, [x_em, u_em], label=["x(t) (numerical)" "u(t) (numerical)"], color=[:green :red], linewidth=3)
 end
 
@@ -839,7 +844,7 @@ We will apply this function over 2 periods, so the bounds of our space will be $
 @bind n_adv Slider(10:10:5000, show_value=true, default=200)
 
 # ╔═╡ 2d12e9e2-dcdc-470a-ab15-ac55ab1eb6fa
-@bind tend_adv Slider(0:π/10:4*π, show_value=true, default=0)
+@bind tend_adv Slider(0:π/10:10*π, show_value=true, default=0)
 
 # ╔═╡ cea7eafd-a061-47c8-809c-718134107625
 begin
@@ -857,9 +862,9 @@ end;
 # ╔═╡ 80475362-e5cb-4a68-a62f-bac869b9ff30
 begin
 		# Plot results
-		plot(x, u0_adv, label="Initial", linestyle=:dash, linewidth=2)
+		plot(x, u0_adv, label="Initial", linestyle=:dash, linewidth=2,xlabel="space", ylabel="velocity", title="Advection equation")
 		plot!(x, u_up[:,end], label="Backward Difference", linewidth=2)
-		plot!(x, u_cen[:,end], label="Central Difference", linewidth=2)
+		#plot!(x, u_cen[:,end], label="Central Difference", linewidth=2)
 end
 
 # ╔═╡ 02d31381-72bd-41c3-a675-367d9f04c7ea
@@ -2559,7 +2564,7 @@ version = "1.4.1+2"
 # ╠═1056c069-91d7-4a14-b9d0-49a7a15f4c29
 # ╠═58c6c046-5a24-4215-a80a-0e8e6391da9b
 # ╠═82acd74a-268e-4ccc-8889-6175364e955f
-# ╟─d18e6dea-edeb-4838-914f-6f86eba29916
+# ╠═d18e6dea-edeb-4838-914f-6f86eba29916
 # ╟─ae8aa528-345d-4ec1-95f3-382667e13e66
 # ╟─85586570-c28a-4ad8-bb9b-2001f0917097
 # ╟─71768cd5-5d12-4d48-8725-a4cfd0a9a8f0
