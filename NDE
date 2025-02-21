@@ -222,9 +222,9 @@ tend = periods*2*π/ω
 # ╔═╡ 7621d92d-9ef2-4dd4-a9bd-8f3bfb2b96f7
 plot(0:0.05:tend, 
      [t -> dydt(t, 0), t -> y(t, 0)], # y and y'
-     label=["y'(t)" "y(t)"],
+     label=["y'(t) = -cos(ωt)" "y(t) = A/ω sin(ωt)"],
      legend=:topright,
-     title="y(t) = (A/ω) sin(ωt)",
+     title=" ",
      xlabel="t",
      ylabel="y",
      color=[:blue :orange],
@@ -249,10 +249,10 @@ end;
 let 
 plot(0:0.05:tend, 
      [t -> dydt(t, 0), t -> y(t, 0)], # y and y'
-     label=["y'(t)" "y(t)"],
+     label=["y'(t) = -cos(ωt)" "y(t) = A/ω sin(ωt)"],
      legend=:topright,
 	 legend_columns=-1,
-     title="y(t) = (A/ω)*sin(ωt)",
+     title=" ",
      xlabel="t",
      ylabel="y",
      color=[:blue :orange],
@@ -455,10 +455,10 @@ end;
 let 
 plot(0:0.05:tend, 
      [t -> y(t, 0)], # y 
-     label="y(t)",
+     label="y(t)= (A/ω) sin(ωt)",
      legend=:topright,
 	 # legend_columns=-1,
-     title="y(t) = = (A/ω)*sin(ωt)",
+     title=" ",
      xlabel="t",
      ylabel="y",
      color=[:blue :orange],
@@ -509,10 +509,10 @@ end;
 let 
 plot(0:0.05:tend_exp, 
      [t -> f_exp(t, 1)], # y 
-     label="f(t)",
+     label="f(t) = y0 e^-t",
      legend=:topright,
 	 # legend_columns=-1,
-     title="f(t) = y0 e^-2t",
+     title=" ",
      xlabel="t",
      ylabel="y",
      color=:blue,
@@ -666,9 +666,9 @@ In the backward difference scheme, we use the difference between the value at th
 TikzPicture(L"""
 % Axes
 \draw[->, line width=1.2mm] (-0.5, 0) -- (4.5, 0) node[below, font=\fontsize{25}{30}] {$x$};
-\draw[->, line width=1.2mm] (0, -0.5) -- (0, 2.5) node[left, font=\fontsize{25}{30}] {$U$};
+\draw[->, line width=1.2mm] (0, -0.5) -- (0, 2.5) node[left, font=\fontsize{25}{30}] {$u$};
 
-% Smooth function U(x) = 0.2x^2
+% Smooth function x(x) = 0.2x^2
 \draw[thick, blue, domain=0.5:3.5, smooth, variable=\x, line width=1mm] 
     plot ({\x}, {0.2*\x^2}) node[right, font=\fontsize{25}{30}] {$U(x)$};
 
@@ -678,26 +678,30 @@ TikzPicture(L"""
 }
 
 % Labels for points
-\node[font=\fontsize{25}{30}] at (1, -0.5) {$x_{i-1}$};
-\node[font=\fontsize{25}{30}] at (2, -0.5) {$x_i$};
-\node[font=\fontsize{25}{30}] at (3, -0.5) {$x_{i+1}$};
+\node[font=\fontsize{25}{30}] at (1, -0.2) {$x_{i-1}$};
+\node[font=\fontsize{25}{30}] at (2, -0.2) {$x_i$};
+\node[font=\fontsize{25}{30}] at (3, -0.2) {$x_{i+1}$};
 
-\node[font=\fontsize{25}{30}, above] at (1, 0.2) {$U_{i-1}$};
-\node[font=\fontsize{25}{30}, above] at (2, 0.8) {$U_{i}$};
-\node[font=\fontsize{25}{30}, above] at (3, 1.8) {$U_{i+1}$};
+% Delta x annotations
+\draw[<->, line width=1mm] (1, -0.4) -- (2, -0.4) node[midway, below, font=\LARGE] {$\Delta x$};
+\draw[<->, line width=1mm] (2, -0.4) -- (3, -0.4) node[midway, below, font=\LARGE] {$\Delta x$};
+
+\node[font=\fontsize{25}{30}, above, yshift=8pt, xshift=-35pt] at (1, 0.2) {$u_{i-1}$};
+\node[font=\fontsize{25}{30}, right, xshift=15pt] at (2, 0.8) {$u_{i}$};
+\node[font=\fontsize{25}{30}, right, yshift=2pt, xshift=15pt] at (3, 1.8) {$u_{i+1}$};
 
 % Backward difference slopes
 \draw[dashed, green, line width=1mm] (1, 0.2) -- (2, 0.8) 
     node[midway, above, sloped, font=\fontsize{25}{30}] 
-    {$\frac{\partial U_i}{\partial x_i} \approx \frac{U_i - U_{i-1}}{\Delta x}$};
+    {$\frac{\partial u_i}{\partial x_i} \approx \frac{u_i - u_{i-1}}{\Delta x}$};
 
 % Extend the approximate derivative slope
 \draw[dashed, yellow, line width=0.4mm] (2, 0.8) -- (3, 1.4);
 
-% Tangent line at U_i
+% Tangent line at u_i
 \draw[dashed, purple, line width=1mm] (1, 0) -- (3, 1.6) 
     node[midway, below, sloped, font=\Huge] 
-    {$\left. \frac{\partial U}{\partial x} \right|_{x_i}$};
+    {$\left. \frac{\partial u}{\partial x} \right|_{x_i}$};
 
 
 """, options="scale=5.0", preamble="")
@@ -748,11 +752,11 @@ In order to obtain a more accurate approximation of the derivative than what we 
 TikzPicture(L"""
 % Axes
 \draw[->, line width=1.2mm] (-0.5, 0) -- (4.5, 0) node[below, font=\fontsize{25}{30}] {$x$};
-\draw[->, line width=1.2mm] (0, -0.5) -- (0, 2.5) node[left, font=\fontsize{25}{30}] {$U$};
+\draw[->, line width=1.2mm] (0, -0.5) -- (0, 2.5) node[left, font=\fontsize{25}{30}] {$u$};
 
-% Smooth function U(x) = 0.2x^2
+% Smooth function u(x) = 0.2x^2
 \draw[thick, blue, domain=0.5:3.5, smooth, variable=\x, line width=1mm] 
-    plot ({\x}, {0.2*\x^2}) node[right, font=\fontsize{25}{30}] {$U(x)$};
+    plot ({\x}, {0.2*\x^2}) node[right, font=\fontsize{25}{30}] {$u(x)$};
 
 % Grid points (smaller)
 \foreach \x in {1,2,3} {
@@ -760,23 +764,27 @@ TikzPicture(L"""
 }
 
 % Labels for points
-\node[font=\fontsize{25}{30}] at (1, -0.5) {$x_{i-1}$};
-\node[font=\fontsize{25}{30}] at (2, -0.5) {$x_i$};
-\node[font=\fontsize{25}{30}] at (3, -0.5) {$x_{i+1}$};
+\node[font=\fontsize{25}{30}] at (1, -0.2) {$x_{i-1}$};
+\node[font=\fontsize{25}{30}] at (2, -0.2) {$x_i$};
+\node[font=\fontsize{25}{30}] at (3, -0.2) {$x_{i+1}$};
 
-\node[font=\fontsize{25}{30}, above] at (1, 0.2) {$U_{i-1}$};
-\node[font=\fontsize{25}{30}, above] at (2, 0.8) {$U_{i}$};
-\node[font=\fontsize{25}{30}, above] at (3, 1.8) {$U_{i+1}$};
+% Delta x annotations
+\draw[<->, line width=1mm] (1, -0.4) -- (2, -0.4) node[midway, below, font=\LARGE] {$\Delta x$};
+\draw[<->, line width=1mm] (2, -0.4) -- (3, -0.4) node[midway, below, font=\LARGE] {$\Delta x$};
+
+\node[font=\fontsize{25}{30}, above, yshift=8pt, xshift=-35pt] at (1, 0.2) {$u_{i-1}$};
+\node[font=\fontsize{25}{30}, right, xshift=15pt] at (2, 0.8) {$u_{i}$};
+\node[font=\fontsize{25}{30}, right, yshift=2pt, xshift=15pt] at (3, 1.8) {$u_{i+1}$};
 
 % Center difference slopes
 \draw[dashed, green, line width=1mm] (1, 0.2) -- (3, 1.8) 
     node[midway, above, sloped, font=\Huge] 
-    {$\frac{\partial U_i}{\partial x_i} \approx \frac{U_{i+1} - U_{i-1}}{2\Delta x}$};
+    {$\frac{\partial u_i}{\partial x_i} \approx \frac{u_{i+1} - u_{i-1}}{2\Delta x}$};
 
-% Tangent line at U_i
+% Tangent line at u_i
 \draw[dashed, purple, line width=1mm] (1, 0) -- (3, 1.6) 
     node[midway, below, sloped, font=\Huge] 
-    {$\left. \frac{\partial U}{\partial x} \right|_{x_i}$};
+    {$\left. \frac{\partial u}{\partial x} \right|_{x_i}$};
 
 
 """, options="scale=5.0", preamble="")
@@ -2532,11 +2540,11 @@ version = "1.4.1+2"
 # ╠═34585319-cda0-4ab8-89ae-cc37f94ac5c2
 # ╠═b48afcb2-5e44-4ca2-8efe-fa6d7ab6d3a6
 # ╠═3ec90b1b-a31a-44cc-845a-0c6bd2dd5b64
-# ╟─7621d92d-9ef2-4dd4-a9bd-8f3bfb2b96f7
+# ╠═7621d92d-9ef2-4dd4-a9bd-8f3bfb2b96f7
 # ╠═13a5b760-070c-4858-b8c0-bc801612d5b2
 # ╠═c9d28fd0-f4b9-4ad3-b530-dabc3c005764
 # ╠═f55e334c-2239-4d37-840c-71a0bdc8c99b
-# ╟─ca9a9091-fd84-44ca-9048-ea1da3c6158f
+# ╠═ca9a9091-fd84-44ca-9048-ea1da3c6158f
 # ╟─7b6262e0-ddcf-49cb-9915-371e9a51d377
 # ╟─60151a76-033a-4f41-8c3d-595391d5a1d1
 # ╟─d418ef42-cf94-4a90-8945-2b55f72841fc
@@ -2549,13 +2557,13 @@ version = "1.4.1+2"
 # ╠═bf93bbe9-0392-4f41-8f44-e187bf12f83c
 # ╠═eed5bc7d-aa40-4d41-98dc-b31c4d93c389
 # ╠═8deed0fb-f94a-4bb4-9e72-474ba5b6d927
-# ╟─517664d7-86fc-4f8f-9951-60d24deebf6d
+# ╠═517664d7-86fc-4f8f-9951-60d24deebf6d
 # ╟─8bb39f85-ee52-4d5b-bbaa-3489315b0c13
 # ╠═f9a36c65-99ee-4134-a9ed-c2d2fada1fac
 # ╠═f89cea13-7da2-4a5b-bc5d-6069076726a2
 # ╠═f8279035-637f-4991-9947-13d5cf02b83b
 # ╠═ab1d6667-a57f-4d6c-a8e1-6a2e470c58d9
-# ╟─9cdc451f-735c-4722-acd5-fc3ab91b62c4
+# ╠═9cdc451f-735c-4722-acd5-fc3ab91b62c4
 # ╟─e39eb891-d858-4294-9dd4-c02d068b1dc3
 # ╠═e8dd2af7-1f0e-499f-a274-1613d79a28d4
 # ╠═4c8b6895-16d5-4a5a-aac2-8f806bfb4f9f
@@ -2564,7 +2572,7 @@ version = "1.4.1+2"
 # ╠═1056c069-91d7-4a14-b9d0-49a7a15f4c29
 # ╠═58c6c046-5a24-4215-a80a-0e8e6391da9b
 # ╠═82acd74a-268e-4ccc-8889-6175364e955f
-# ╠═d18e6dea-edeb-4838-914f-6f86eba29916
+# ╟─d18e6dea-edeb-4838-914f-6f86eba29916
 # ╟─ae8aa528-345d-4ec1-95f3-382667e13e66
 # ╟─85586570-c28a-4ad8-bb9b-2001f0917097
 # ╟─71768cd5-5d12-4d48-8725-a4cfd0a9a8f0
