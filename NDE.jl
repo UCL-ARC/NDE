@@ -220,7 +220,7 @@ md"""
 Lets try this method out using a function which we know the solution for, such as the previous example of a sinusoidal function.
 
 We define the differential equation as:\
-$\dfrac{dy}{dt} = A cos(\omega t)$ \
+$\dfrac{dy(t)}{dt} = A cos(\omega t)$ \
 
 where $t$ is time, $A$ is the amplitude of the oscillation and $\omega = \frac{2 \pi}{T}$ is the frequency converted from angles to radians (i.e. how many oscillations occur over a period of time) and $T$ is the period of the oscillations.
 
@@ -248,7 +248,7 @@ dydt(t, y) = A * cos(ω * t);
 y(t, y) = (A / ω) * sin(ω * t);
 
 # ╔═╡ b48afcb2-5e44-4ca2-8efe-fa6d7ab6d3a6
-# The number of periods
+# The number of periods of oscillation
 p_slider = @bind periods Slider(0:0.5:8.0, show_value=true, default=1)
 
 # ╔═╡ 3ec90b1b-a31a-44cc-845a-0c6bd2dd5b64
@@ -488,10 +488,10 @@ We already have everything defined, so we will just place the soliders here for 
 """
 
 # ╔═╡ bf93bbe9-0392-4f41-8f44-e187bf12f83c
-n_slider
+n_slider # Number of steps
 
 # ╔═╡ eed5bc7d-aa40-4d41-98dc-b31c4d93c389
-p_slider
+p_slider # Periods of ocillation
 
 # ╔═╡ 8deed0fb-f94a-4bb4-9e72-474ba5b6d927
 begin
@@ -521,7 +521,7 @@ md"""
 ## Stability
 
 Lets try solving a different ODE now.  We will use the an exponentially decaying function.  As a reminder, the exponential function is a function whose derivative is itself.  To make it decaying, we can set the derivative to be the negative value of itself. i.e.\
-$\dfrac{d y}{d t} = -y(t)$
+$\dfrac{d y(t)}{d t} = -y(t)$
 
 This function has the exact solution\
 $y(t) = y_0 e^{-t}$
@@ -551,16 +551,15 @@ begin
 	
 	t_fe_exp, y_fe_exp = forward_euler(df_exp, t0_exp, tend_exp, y0_exp, n_exp) 
 	t_be_exp, y_be_exp = backward_euler(df_exp, t0_exp, tend_exp, y0_exp, n_exp) 
-	t_em_exp, y_em_exp = explicit_midpoint(df_exp, t0_exp, tend_exp, y0_exp, n_exp) 
 end;
 
 # ╔═╡ 706f402f-4092-4982-87a7-75f6e9378c73
   begin
-  	current_dt = (tend_exp - t0_exp) / n_exp
-
+  	current_dt_exp = (tend_exp - t0_exp) / n_exp
+	
   	md"""
   	**Step size:**
-  	Δt = $(round(current_dt, digits=2))
+  	Δt = $(round(current_dt_exp, digits=2))
   	"""
   end
 
@@ -608,7 +607,7 @@ md"""
 
 The examples above are all of "first order" ODEs with initial value: this means the derivative we have on the left hand side of the equation is a first order derivative.  If you recall Newtown second law which we touched on at the start, $F = m \cdot a$ then the acceleration, $a$, is a second order derivative of displacement, i.e. 
 
-$a = \dfrac{du}{dt} = \dfrac{d \dfrac{dx}{dt}}{dt} = \dfrac{d^2 x}{d t^2}$
+$a(t) = \dfrac{du(t)}{dt} = \dfrac{d \dfrac{dx(t)}{dt}}{dt} = \dfrac{d^2 x(t)}{d t^2}$
 
 Now, if we want to find our displacement from the mass and the force we have applied over a period of time, we can rewrite the equation as:\
 $\dfrac{d^2 x(t)}{d t^2} = \dfrac{F(t)}{m}$
@@ -616,17 +615,14 @@ $\dfrac{d^2 x(t)}{d t^2} = \dfrac{F(t)}{m}$
 **Note that in this example we assume the force only depends on time and does not change (i.e. is constant) with respect to space!  This is important as we will see in a future presentation on the Finite Difference method.**
 
 To solve this second-order ODE, we typically decompose it into a system of first order ODEs as follows:\
-$\dfrac{d x}{d t} = u$ (solving this will ODE will give us the displacement $x$)\
+$\dfrac{d x(t)}{d t} = u(t)$ (This ODE will give us the displacement $x$)\
 \
-$\dfrac{d u}{d t} = a = \dfrac{F}{m}$  (solving this ODE will give us the velocity $u$)
+$\dfrac{d u(t)}{d t} = \dfrac{F(t)}{m} = a(t)$  (This ODE will give us the velocity $u$)
 
-Lets have a quick go at solving this.  We set the mass to be 1kg for simplicity, and apply a sinusoidal force $a = -sin(\omega t)$.
+Notice that the first equation for solving the displacement depends on $u$, which we only get from solving the second equation. This means we must solve them in order.
 
+Lets have a quick go at solving this.  
 To accommodate for a system of ODEs, we can modify the explicit midpoint method so that the solution can take arguments for multiple variables (in form of a vector), in this case consisting of $x$ and $u$.  Although we only require two variables, we might as well modify the code to accept any size vector. 
-
-We also need to define the initial conditions. As we have two equations, each one of them requires a separate intial condition, one for the initial displacment, $x(t=0) = x_0$ and one for initial veolcity, $u(t=0) = u_0$.  We will set the initial displacement to zero, $x_0 = 0$, and the initial velocity to $u_0 = A / \omega$ in order to describe a pure "harmonic oscillator".
-
-This system of ODEs is very similar to the motion of a [simple pendulum](https://en.wikipedia.org/wiki/Pendulum_(mechanics)#Simple_gravity_pendulum). It could be a fun exercise for you to try and change the parameters for this case!
 """
 
 # ╔═╡ e8dd2af7-1f0e-499f-a274-1613d79a28d4
@@ -649,10 +645,16 @@ function explicit_midpoint_system(f, t0, tend, y0, n)
     return t, y
 end;
 
+# ╔═╡ c33782d6-f281-48d0-8955-6d22da17af0f
+md"""
+Now lets define our parametes.  We set the mass to be 1kg for simplicity, and apply a sinusoidal force $a(t) = -sin(\omega t)$.
+We also need to define the initial conditions. As we have two equations, each one of them requires a separate intial condition, one for the initial displacment, $x(t=0) = x_0$ and one for initial veolcity, $u(t=0) = u_0$.  We will set the initial displacement to zero, $x_0 = 0$, and the initial velocity to $u_0 = A / \omega$.  This arrangement describes what is know as a pure "harmonic oscillator".
+"""
+
 # ╔═╡ 4c8b6895-16d5-4a5a-aac2-8f806bfb4f9f
 # System of ODEs
 function system_ode(t, y)
-    x, u = y
+    x, u = y # Vector of (x,y)
     return [u, -A * sin(ω * t)] 
 end;
 
@@ -663,17 +665,32 @@ begin
 	u_exact(t, u0) = u0 - A/ω + (A * cos(ω * t)) / ω
 end;
 
+# ╔═╡ d22a4240-b24a-44bd-a88b-e75e9af93478
+md"""
+Now let's place our sliders from the initial sinusoidal example so we can play around with the variables and see what happens.
+"""
+
 # ╔═╡ e26ad0d9-c6e3-4949-9d0f-fe05b85940fe
-A_slider
+A_slider # Amplitude
 
 # ╔═╡ 1056c069-91d7-4a14-b9d0-49a7a15f4c29
-ω_slider
+ω_slider # Frequency
 
 # ╔═╡ 58c6c046-5a24-4215-a80a-0e8e6391da9b
-p_slider
+p_slider # Periods of oscillation
 
 # ╔═╡ 82acd74a-268e-4ccc-8889-6175364e955f
-n_slider
+n_slider # Number of points
+
+# ╔═╡ 31566cb4-eb64-43b0-bc8f-83b7bd2d5094
+  begin
+  	current_dt_sin = (tend_sin - t0_sin) / n
+	  
+  	md"""
+  	**Step size:**
+  	Δt = $(round(current_dt_sin, digits=2))
+  	"""
+  end
 
 # ╔═╡ d18e6dea-edeb-4838-914f-6f86eba29916
 begin
@@ -690,8 +707,17 @@ begin
 	
 	# Plot results
 	plot(0:0.05:tend_sin, [t -> x_exact.(t, x0_osc, u0_osc), t -> u_exact.(t, u0_osc)], linewidth=2,markershape=:circle, label=["x(t) (exact)" "u(t) (exact)"], color=[:blue :orange],xlabel="t", ylabel="y",title="y''(t) = = -sin(ωt)")
-	plot!(t_sim, [x_em, u_em], label=["x(t) (numerical)" "u(t) (numerical)"], color=[:green :red], linewidth=3)
+	plot!(t_sim, [x_em, u_em], label=["x(t) (numerical)" "u(t) (numerical)"], color=[:green :red], linewidth=3, xlabel="Time", ylabel="Displacement")
 end
+
+# ╔═╡ 0e486804-bfdb-48ae-a0e9-5cede56ff8e8
+md"""
+Lets set the Amplitude and Frequency sliders bot to 1, and only pay attension to the number of periods to solve, and the number of steps to use, as they are used to calculate the step size, $\Delta t$.  Let move them so that we get a step size of $0.3--0.5$.
+
+The first thing to note is that, as we are using the midpoint method, we get quite good answers (i.e. with small errors) with relaviely few points.  The other is that the error in the displacment numerical approximation is significantly larger than the error in the velocity.  This is due to the dependancy of $x_n$ on $u_n$ at each time-step, compounding the approximation errors.
+
+This system of ODEs is very similar to the motion of a [simple pendulum](https://en.wikipedia.org/wiki/Pendulum_(mechanics)#Simple_gravity_pendulum). It could be a fun exercise for you to try and change the parameters for this case!
+"""
 
 # ╔═╡ ae8aa528-345d-4ec1-95f3-382667e13e66
 # ╠═╡ disabled = true
@@ -2412,17 +2438,21 @@ version = "1.4.1+2"
 # ╠═f8279035-637f-4991-9947-13d5cf02b83b
 # ╠═ab1d6667-a57f-4d6c-a8e1-6a2e470c58d9
 # ╟─706f402f-4092-4982-87a7-75f6e9378c73
-# ╠═9cdc451f-735c-4722-acd5-fc3ab91b62c4
+# ╟─9cdc451f-735c-4722-acd5-fc3ab91b62c4
 # ╟─70df97ce-e91d-4700-936c-3011604ef852
-# ╠═e39eb891-d858-4294-9dd4-c02d068b1dc3
+# ╟─e39eb891-d858-4294-9dd4-c02d068b1dc3
 # ╠═e8dd2af7-1f0e-499f-a274-1613d79a28d4
+# ╟─c33782d6-f281-48d0-8955-6d22da17af0f
 # ╠═4c8b6895-16d5-4a5a-aac2-8f806bfb4f9f
 # ╠═892714ec-1bf1-42da-b2f5-84090a326654
+# ╟─d22a4240-b24a-44bd-a88b-e75e9af93478
 # ╠═e26ad0d9-c6e3-4949-9d0f-fe05b85940fe
 # ╠═1056c069-91d7-4a14-b9d0-49a7a15f4c29
 # ╠═58c6c046-5a24-4215-a80a-0e8e6391da9b
 # ╠═82acd74a-268e-4ccc-8889-6175364e955f
+# ╟─31566cb4-eb64-43b0-bc8f-83b7bd2d5094
 # ╟─d18e6dea-edeb-4838-914f-6f86eba29916
+# ╟─0e486804-bfdb-48ae-a0e9-5cede56ff8e8
 # ╟─ae8aa528-345d-4ec1-95f3-382667e13e66
 # ╟─02d31381-72bd-41c3-a675-367d9f04c7ea
 # ╟─1ffe20fa-e910-484e-992b-8e1160f68086
