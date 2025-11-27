@@ -78,7 +78,11 @@ md"""
 
 We can solve these kind of equations relatively easily on paper when we can obtain a nice and smooth analytical expression for the derivative, such as  
 
-$\dfrac{dx}{dt} = cos(t)$  
+$\dfrac{dx}{dt} = cos(t)$\
+
+which has a know solutino in the sinusoidal function
+
+$x(t) = sin(t)$
 
 However, in almost all the problems we deal with in the real world the expression on the right hand side of this equation is far more complicated and we simply have no way of solving it by hand.  For instance, returning to the driving example, in the real world we would have additional variables such as road slope, aerodynamic drag, and traffic effects. A more realistic model looks like
 
@@ -111,7 +115,7 @@ With all that said, lets get started!
 md"""
 # The "numerics" in numerical differential equations 
 ### (or how do we approximate the solutions to differential equations using computers)
-We will go over 3 of the basic ODE solution methods and some of their features, then use them to solve some problems.  The methods are:
+To get a good understanding of how to solve our ODEs, we will introduce three of the basic solution methods, discuss some of their features, then use them to solve some problems.  The methods are:
 * Forward Euler
 * Backwards Euler
 * Midpoint method
@@ -122,7 +126,9 @@ We will go over 3 of the basic ODE solution methods and some of their features, 
 md"""
 ## Forward Euler
 
-The forward Euler method is the most fundamental numerical differential equation method for solving ODEs with an initial value (know as Initial Value Problems, or IVP for short).  It works by using the fact that the derivative describes the slope of any tangential line to the unknown solution function. Assuming that the slope does not change 'too' much within a small interval, we can take small 'steps' along the tangent lines one by one. This draws a function that, with small enough steps, will approximate the unknown solution function. \
+The forward Euler method is the most fundamental numerical differential equation method for solving ODEs. For now, we will restrict the ODEs to ones that have an initial condition (know as Initial Value Problems, or IVP for short), which is a class of ODEs that are commonly used to model how a system evolves with time from an initial known state.
+
+The Forward Euler method works by using the fact that the derivative describes the slope of any tangential line to the unknown solution function. Assuming that the slope does not change 'too' much within a small interval, we can take small 'steps' along the tangent lines one by one. This draws a function that, with small enough steps, will approximate the unknown solution function. \
 
 
 Mathematically, this can be expressed as:\
@@ -203,16 +209,26 @@ function forward_euler(f, t0, tend, y0, n)
     return t, y
 end;
 
+# ╔═╡ 23cf9c52-722d-4289-bb6a-014b6214e402
+md"""
+It takes as input the differential equation, `f`, the start time `t0`, the end time `tend`, the initial condition, `y0` and the number of steps, `n`.
+"""
+
 # ╔═╡ 6d9e5c6c-3be2-4bf6-8a5a-631bdf666571
 md"""
 
 Lets try this method out using a function which we know the solution for, such as the previous example of a sinusoidal function.
 
-We define\
-$\dfrac{dy}{dt} = A cos(\omega t)$\
+We define the differential equation as:\
+$\dfrac{dy}{dt} = A cos(\omega t)$ \
 
 where $t$ is time, $A$ is the amplitude of the oscillation and $\omega = \frac{2 \pi}{T}$ is the frequency converted from angles to radians (i.e. how many oscillations occur over a period of time) and $T$ is the period of the oscillations.
 
+The solution to this equation is:
+ 
+$y(t) = \dfrac{A}{\omega} \sin (\omega t)$
+
+Lets put this into code, together with some sliders that will allow us to change the values of these variables on the fly so we can see what we are trying to solve.
 """
 
 # ╔═╡ 2f94dee0-a83c-4af5-9b46-a3a665fd2a55
@@ -236,11 +252,11 @@ y(t, y) = (A / ω) * sin(ω * t);
 p_slider = @bind periods Slider(0:0.5:8.0, show_value=true, default=1)
 
 # ╔═╡ 3ec90b1b-a31a-44cc-845a-0c6bd2dd5b64
-# The physical time units
-tend = periods*2*π/ω
+# The time units
+tend_sin = periods*2*π/ω
 
 # ╔═╡ 7621d92d-9ef2-4dd4-a9bd-8f3bfb2b96f7
-plot(0:0.05:tend, 
+plot(0:0.05:tend_sin, 
      [t -> dydt(t, 0), t -> y(t, 0)], # y and y'
      label=["y'(t) = -cos(ωt)" "y(t) = A/ω sin(ωt)"],
      legend=:topright,
@@ -252,22 +268,32 @@ plot(0:0.05:tend,
      markershape=:circle)
 
 
+# ╔═╡ 641bdfb1-4b43-424f-99e4-689200b16fb0
+md"""
+Now let's add another slider now for the Forward Euler method which will set the number of steps we want to use to obtain the solution.
+"""
+
 # ╔═╡ 13a5b760-070c-4858-b8c0-bc801612d5b2
 n_slider = @bind n Slider(2:1:500, show_value=true, default=20);
 
 # ╔═╡ c9d28fd0-f4b9-4ad3-b530-dabc3c005764
 n_slider
 
+# ╔═╡ 8bf738f5-496e-400f-881f-1abacd8ce56c
+md"""
+Finally, let's use the code we wrote above for the method to actually solve the problem.  Remember the method took as input the differential equation `dydt`, the initial time we want to start solving this problem at `t0_sin`, the total time we want to solve for, `tend`, the initial condition, `y0_sin` and the number of steps from the slider above `n`.
+"""
+
 # ╔═╡ f55e334c-2239-4d37-840c-71a0bdc8c99b
 begin
 	t0_sin = 0
 	y0_sin = 0
-	t_fe, y_fe = forward_euler(dydt, t0_sin, tend, y0_sin, n) 
+	t_fe, y_fe = forward_euler(dydt, t0_sin, tend_sin, y0_sin, n) 
 end;
 
 # ╔═╡ ca9a9091-fd84-44ca-9048-ea1da3c6158f
 let 
-plot(0:0.05:tend, 
+plot(0:0.05:tend_sin, 
      [t -> dydt(t, 0), t -> y(t, 0)], # y and y'
      label=["y'(t) = -cos(ωt)" "y(t) = A/ω sin(ωt)"],
      legend=:topright,
@@ -457,6 +483,8 @@ end;
 md"""
 ## Comparing the methods
 Now that we have all three methods defined, lets compare how they work using the sinusoidal function we used to inspect the Euler method.
+
+We already have everything defined, so we will just place the soliders here for convenience, and add the new methods to the plot.
 """
 
 # ╔═╡ bf93bbe9-0392-4f41-8f44-e187bf12f83c
@@ -467,13 +495,13 @@ p_slider
 
 # ╔═╡ 8deed0fb-f94a-4bb4-9e72-474ba5b6d927
 begin
-	t_be, y_be = backward_euler(dydt, t0_sin, tend, y0_sin, n) 
-	t_em, y_em = explicit_midpoint(dydt, t0_sin, tend, y0_sin, n) 
+	t_be, y_be = backward_euler(dydt, t0_sin, tend_sin, y0_sin, n) 
+	t_em, y_em = explicit_midpoint(dydt, t0_sin, tend_sin, y0_sin, n) 
 end;
 
 # ╔═╡ 517664d7-86fc-4f8f-9951-60d24deebf6d
 let 
-plot(0:0.05:tend, 
+plot(0:0.05:tend_sin, 
      [t -> y(t, 0)], # y 
      label="y(t)= (A/ω) sin(ωt)",
      legend=:topright,
@@ -498,8 +526,9 @@ $\dfrac{d y}{d t} = -y(t)$
 This function has the exact solution\
 $y(t) = y_0 e^{-t}$
 
-Lets write these functions in code and compare how our numerical differential equation solvers approximate it:
+Lets write these functions in code and compare how our numerical differential equation solvers approximate it.  We will evaluate the functions from $t=0$ up to $t=20$ and set the initial condition to $1$, i.e. $y(t=0) = y_0 = 1$.
 
+For simplicity, lets only look at the Forward and Backward Euler methods for now, and create a new slider for the number of steps we will use.
 """
 
 # ╔═╡ f9a36c65-99ee-4134-a9ed-c2d2fada1fac
@@ -525,28 +554,6 @@ begin
 	t_em_exp, y_em_exp = explicit_midpoint(df_exp, t0_exp, tend_exp, y0_exp, n_exp) 
 end;
 
-# ╔═╡ 70df97ce-e91d-4700-936c-3011604ef852
-md"""
-Now, lets have a look at our different methods. To begin with, we are using 15 steps, which gives as a rather large step size as indicated by the step size counter above the plot.  The step size is 1.33, which means that we are striding forward at intervals of 1.33 units (in this case, of time).
-
-Lets go step by step with the two different Euler methods. With the Forward Euler method, this means that for the first interval, we are moving from $y_0=1$ by $\Delta t \cdot -y$, which means we are moving by $-1.33$ as the slope at t=0 is $-y_0$ which is -1, so we are now at $-0.33$!  We really overshot where we should be.  
-
-With the backwards Euler, we use the slope at $t=1.33$, which happens to be $-y(1.33)$. We don't know the value yet, but we can find it by solving the equation
-$y_1 = y_0 + \Delta t \cdot -y_1 \Rightarrow y_1 = 1/2.33 = 0.4286$
-
-This is still an overestimate compared to the exact solution $y(1.33) = e^{-1.33} \approx 0.26$, but at least it's moving in the right direction and stays positive!
-
-If we take further steps like this with both methods, we'll see that the Forward Euler method oscillates up and down before eventually converging, while the Backward Euler method smoothly decays toward the solution without oscillations.
-
-Now, let move the slider down to 10 steps.  In this case, the oscillations in the Forward Euler method got so big, that it can no longer recover and get closer to the real solution, it just goes back and forth endlessly!  However, the Backwards Euler doesn't have this issue, and while it has significant errors, it does eventually still reach the right solution even with so few steps.  You can try and do these steps by hand and see what happens.  We can also see that something strange is happening with the Explicit midpoint method - it also got stuck and just remains as a straight line.  It is a little harder to intuitively follow what it is doing, but by working out its steps one by one it will become clear.
-
-Now, let's move the slider even further to the left so it goes under 10 steps.  In this case we can see that the Forward Euler method (and the Explicit midpoint method) just explode!  This is called divergence; when the method have errors that instead of shrinking and eventually getting closer to the solution, grow and grow indefinitely.
-
-Lastly, lets move the slider to the right and increase the number of steps more and more.  Eventually we'll see the familiar behaviour where the errors of the Forward and Backward method are similar and the Explicit midpoint method is more accurate.  This is the expected behaviour when the steps are small enough to avoid overshooting the solution by an unrecoverable amout!
-
-What we just witnessed here is called the stability of the method. While the rate at which the Forward and Backward Euler methods converge is the same, their stability is in fact very different. This is a general trend for implicit and explicit methods: explicit methods are simpler and faster to solve, but require smaller steps to stay stable, while implicit methods are more complicated and require solving an additional equation, but are unconditionally stable and can still work even with large steps!  This can be very advantagious as in some cases the number of steps we would need to make the explicit method stable are more than we can computationally afford and our only option becomes using implicit methods.
-"""
-
 # ╔═╡ 706f402f-4092-4982-87a7-75f6e9378c73
   begin
   	current_dt = (tend_exp - t0_exp) / n_exp
@@ -560,10 +567,9 @@ What we just witnessed here is called the stability of the method. While the rat
 # ╔═╡ 9cdc451f-735c-4722-acd5-fc3ab91b62c4
 let 
 plot(0:0.05:tend_exp, 
-     [t -> f_exp(t, y0_exp)], # y 
+     [t -> f_exp(t, y0_exp)], # analytical function for y
      label="f(t) = y0 e^{-t}",
      legend=:topright,
-	 # legend_columns=-1,
      title=" ",
      xlabel="t",
      ylabel="y",
@@ -572,31 +578,55 @@ plot(0:0.05:tend_exp,
      markershape=:circle)
 plot!(t_be_exp, y_be_exp, label="Backward Euler", color=:magenta, linewidth=3)
 plot!(t_fe_exp, y_fe_exp, label="Forward Euler", color=:green, linewidth=3)
-plot!(t_em_exp, y_em_exp, label="Explicit midpoint", color=:yellow, linewidth=3)
 end
+
+# ╔═╡ 70df97ce-e91d-4700-936c-3011604ef852
+md"""
+Now, lets have a look at our different methods. To begin with, we are using 15 steps, which gives as a rather large step size as indicated by the step size counter above the plot.  The step size is 1.33, which means that we are striding forward at intervals of 1.33 units (in this case, of time).
+
+Lets go step by step with the two different Euler methods. With the Forward Euler method, this means that for the first interval, we are moving from $y_0=1$ by $\Delta t \cdot -y$, which means we are moving by $-1.33$ as the slope at t=0 is $-y_0$ which is -1, so we are now at $-0.33$!  We really overshot where we should be.  
+
+With the backwards Euler, we use the slope at $t=1.33$, which happens to be $-y(1.33)$. We don't know the value yet, but we can find it by solving the equation
+$y_1 = y_0 + \Delta t \cdot -y_1 \Rightarrow y_1 = 1/2.33 = 0.4286$
+
+This is still an overestimate compared to the exact solution $y(1.33) = e^{-1.33} \approx 0.26$, but at least it's moving in the right direction and stays positive!
+
+If we take further steps like this with both methods, we'll see that the Forward Euler method oscillates up and down before eventually converging, while the Backward Euler method smoothly decays toward the solution without oscillations.
+
+Now, let move the slider down to 10 steps.  In this case, the oscillations in the Forward Euler method got so big, that it can no longer recover and get closer to the real solution, it just goes back and forth endlessly!  However, the Backwards Euler doesn't have this issue, and while it has significant errors, it does eventually still reach the right solution even with so few steps.  You can try and do these steps by hand and see what happens.
+
+Now, let's move the slider even further to the left so it goes under 10 steps.  In this case we can see that the Forward Euler method just explodes!  This is called divergence; when the method has errors cannot be contained and keep growing and growing indefinitely.
+
+Lastly, lets move the slider to the right and increase the number of steps more and more.  Eventually we'll see the familiar behaviour where the errors of the Forward and Backward method are similar and the Explicit midpoint method is more accurate.  This is the expected behaviour when the steps are small enough to avoid overshooting the solution by an unrecoverable amount!  Why this happens exactly when $\Delta t = 2$ is very important to understand, but unfortunately not within the scope of this introduction.  However, in your own time, trying to follow the steps one by one might give you a good clue.
+
+What we just witnessed here is called the stability of the method. While the rate at which the Forward and Backward Euler methods converge (i.e. how much better they get with decreasing step size) is the same, their stability is in fact very different. This is a general trend for implicit and explicit methods: explicit methods are simpler and faster to solve, but require smaller steps to stay stable; implicit methods are more complicated and require solving an additional equation, but are unconditionally stable and can still work even with large steps.  This can be very advantagious as in some cases the number of steps we would need to make the explicit method stable are more than we can computationally afford and the only option becomes using implicit methods.
+"""
 
 # ╔═╡ e39eb891-d858-4294-9dd4-c02d068b1dc3
 md"""
 ### Higher order differential equations
 
-The examples above are all "first order", that means the derivative we have on the left hand side of the equation is a first order derivative.  If you recall Newtown second law which we touched on at the start, $F = m \cdot a$ then the acceleration, $a$, is a second order derivative of displacement, i.e. $a = \dfrac{d^2 x}{d t^2}$.
+The examples above are all of "first order" ODEs with initial value: this means the derivative we have on the left hand side of the equation is a first order derivative.  If you recall Newtown second law which we touched on at the start, $F = m \cdot a$ then the acceleration, $a$, is a second order derivative of displacement, i.e. 
+
+$a = \dfrac{du}{dt} = \dfrac{d \dfrac{dx}{dt}}{dt} = \dfrac{d^2 x}{d t^2}$
+
 Now, if we want to find our displacement from the mass and the force we have applied over a period of time, we can rewrite the equation as:\
 $\dfrac{d^2 x(t)}{d t^2} = \dfrac{F(t)}{m}$
 
-**Note that in this example we assume the force only depends on time and does not change (i.e. is constant) with respect to space!  This is important as we will see later.**
+**Note that in this example we assume the force only depends on time and does not change (i.e. is constant) with respect to space!  This is important as we will see in a future presentation on the Finite Difference method.**
 
-
-To solve this second-order ODE, we typically decompose it into a system of first order ODEs like follows:\
+To solve this second-order ODE, we typically decompose it into a system of first order ODEs as follows:\
 $\dfrac{d x}{d t} = u$ (solving this will ODE will give us the displacement $x$)\
 \
 $\dfrac{d u}{d t} = a = \dfrac{F}{m}$  (solving this ODE will give us the velocity $u$)
 
-Lets have a quick go at solving this.  We set the mass to be 1kg for simplicity, and apply a sinistral force similar to what we have done before as $a = -sin(\omega t)$.
+Lets have a quick go at solving this.  We set the mass to be 1kg for simplicity, and apply a sinusoidal force $a = -sin(\omega t)$.
 
-To accommodate for a system of ODEs, we will slightly modify the explicit midpoint method so that the solution can take arguments for multiple variables, in this case, $x$ and $u$.  We also need to define out initial conditions.  We will set the initial displacement to zero, $x_0 = 0$, and the initial velocity we will set to $u_0 = A / \omega$ in order to describe a pure "harmonic oscillator".
+To accommodate for a system of ODEs, we can modify the explicit midpoint method so that the solution can take arguments for multiple variables (in form of a vector), in this case consisting of $x$ and $u$.  Although we only require two variables, we might as well modify the code to accept any size vector. 
 
+We also need to define the initial conditions. As we have two equations, each one of them requires a separate intial condition, one for the initial displacment, $x(t=0) = x_0$ and one for initial veolcity, $u(t=0) = u_0$.  We will set the initial displacement to zero, $x_0 = 0$, and the initial velocity to $u_0 = A / \omega$ in order to describe a pure "harmonic oscillator".
 
-This system of ODEs is very similar to the motion of a "simple pendulum". It could be a fun exercise for you to try and change the code for a "simple pendulum" if you so wish.
+This system of ODEs is very similar to the motion of a [simple pendulum](https://en.wikipedia.org/wiki/Pendulum_(mechanics)#Simple_gravity_pendulum). It could be a fun exercise for you to try and change the parameters for this case!
 """
 
 # ╔═╡ e8dd2af7-1f0e-499f-a274-1613d79a28d4
@@ -652,14 +682,14 @@ begin
 	u0_osc = A / ω # to ensure the system is an harmonic oscillator and the linear term is zero
 	t0_osc = 0
 	
-	t_sim, y_sim = explicit_midpoint_system(system_ode, t0_osc, tend, [x0_osc, u0_osc], n)
+	t_sim, y_sim = explicit_midpoint_system(system_ode, t0_osc, tend_sin, [x0_osc, u0_osc], n)
 	
 	# Extract the solutions
 	x_em = y_sim[1, :]
 	u_em = y_sim[2, :]
 	
 	# Plot results
-	plot(0:0.05:tend, [t -> x_exact.(t, x0_osc, u0_osc), t -> u_exact.(t, u0_osc)], linewidth=2,markershape=:circle, label=["x(t) (exact)" "u(t) (exact)"], color=[:blue :orange],xlabel="t", ylabel="y",title="y''(t) = = -sin(ωt)")
+	plot(0:0.05:tend_sin, [t -> x_exact.(t, x0_osc, u0_osc), t -> u_exact.(t, u0_osc)], linewidth=2,markershape=:circle, label=["x(t) (exact)" "u(t) (exact)"], color=[:blue :orange],xlabel="t", ylabel="y",title="y''(t) = = -sin(ωt)")
 	plot!(t_sim, [x_em, u_em], label=["x(t) (numerical)" "u(t) (numerical)"], color=[:green :red], linewidth=3)
 end
 
@@ -2348,6 +2378,7 @@ version = "1.4.1+2"
 # ╟─6e3f6eab-6c50-4775-80c8-5049c469433a
 # ╟─b9a52442-d6d8-44b0-9523-8a942c0ee263
 # ╠═c6e2ce02-50e2-473b-a088-c9d54f9308d6
+# ╟─23cf9c52-722d-4289-bb6a-014b6214e402
 # ╟─6d9e5c6c-3be2-4bf6-8a5a-631bdf666571
 # ╠═0a6bb5ce-ab23-45eb-a7be-1a2f78883861
 # ╠═512590bf-bb61-4afe-a787-ad2484e0fb8e
@@ -2355,11 +2386,13 @@ version = "1.4.1+2"
 # ╠═34585319-cda0-4ab8-89ae-cc37f94ac5c2
 # ╠═b48afcb2-5e44-4ca2-8efe-fa6d7ab6d3a6
 # ╠═3ec90b1b-a31a-44cc-845a-0c6bd2dd5b64
-# ╠═7621d92d-9ef2-4dd4-a9bd-8f3bfb2b96f7
+# ╟─7621d92d-9ef2-4dd4-a9bd-8f3bfb2b96f7
+# ╟─641bdfb1-4b43-424f-99e4-689200b16fb0
 # ╠═13a5b760-070c-4858-b8c0-bc801612d5b2
-# ╠═c9d28fd0-f4b9-4ad3-b530-dabc3c005764
+# ╟─c9d28fd0-f4b9-4ad3-b530-dabc3c005764
+# ╟─8bf738f5-496e-400f-881f-1abacd8ce56c
 # ╠═f55e334c-2239-4d37-840c-71a0bdc8c99b
-# ╠═ca9a9091-fd84-44ca-9048-ea1da3c6158f
+# ╟─ca9a9091-fd84-44ca-9048-ea1da3c6158f
 # ╟─7b6262e0-ddcf-49cb-9915-371e9a51d377
 # ╟─60151a76-033a-4f41-8c3d-595391d5a1d1
 # ╟─d418ef42-cf94-4a90-8945-2b55f72841fc
@@ -2372,7 +2405,7 @@ version = "1.4.1+2"
 # ╠═bf93bbe9-0392-4f41-8f44-e187bf12f83c
 # ╠═eed5bc7d-aa40-4d41-98dc-b31c4d93c389
 # ╠═8deed0fb-f94a-4bb4-9e72-474ba5b6d927
-# ╠═517664d7-86fc-4f8f-9951-60d24deebf6d
+# ╟─517664d7-86fc-4f8f-9951-60d24deebf6d
 # ╟─8bb39f85-ee52-4d5b-bbaa-3489315b0c13
 # ╠═f9a36c65-99ee-4134-a9ed-c2d2fada1fac
 # ╠═f89cea13-7da2-4a5b-bc5d-6069076726a2
@@ -2381,7 +2414,7 @@ version = "1.4.1+2"
 # ╟─706f402f-4092-4982-87a7-75f6e9378c73
 # ╠═9cdc451f-735c-4722-acd5-fc3ab91b62c4
 # ╟─70df97ce-e91d-4700-936c-3011604ef852
-# ╟─e39eb891-d858-4294-9dd4-c02d068b1dc3
+# ╠═e39eb891-d858-4294-9dd4-c02d068b1dc3
 # ╠═e8dd2af7-1f0e-499f-a274-1613d79a28d4
 # ╠═4c8b6895-16d5-4a5a-aac2-8f806bfb4f9f
 # ╠═892714ec-1bf1-42da-b2f5-84090a326654

@@ -27,6 +27,24 @@ jobs:
               with:
                   version: "1" # This will automatically pick the latest Julia version
 
+            - name: Cache LaTeX installation
+              uses: actions/cache@v4
+              id: cache-latex
+              with:
+                  path: |
+                      /usr/share/texlive
+                      /usr/share/texmf
+                      /var/lib/texmf
+                  key: ${{ runner.os }}-texlive-${{ hashFiles('.github/workflows/publish_pluto.yml') }}
+                  restore-keys: |
+                      ${{ runner.os }}-texlive-
+
+            - name: Install LaTeX
+              if: steps.cache-latex.outputs.cache-hit != 'true'
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y texlive-base texlive-latex-extra texlive-luatex pdf2svg
+
             - name: Cache Julia artifacts & such
               uses: julia-actions/cache@v2
               with:
