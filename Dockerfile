@@ -21,7 +21,7 @@ COPY Project.toml  /root/.julia/environments/v1.11/Project.toml
 RUN . /julia_cpu_target.sh && julia --color=yes -e 'using Pkg; Pkg.instantiate()'
 
 # Copy notebook
-COPY NDE /root/NDE.jl
+COPY NDE.jl /root/NDE.jl
 
 # Precompile notebook environment
 RUN . /julia_cpu_target.sh && julia --color=yes -e '\
