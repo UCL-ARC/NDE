@@ -74,6 +74,8 @@ $F(x(t)) = m \dfrac{d^2 x(t)}{dt^2}$
 
 # ╔═╡ 6224fb35-8a3c-4fcd-8dac-33d0e26125ad
 md"""
+## Motivating example
+
 We can solve these kind of equations relatively easily on paper when we can obtain a nice and smooth analytical expression for the derivative, such as  
 
 $\dfrac{dx}{dt} = cos(t)$  
@@ -92,6 +94,7 @@ Even though each of these pieces makes sense on its own, combining them into one
 
 What we need then is some methodology for finding the values of the integral for whatever expression we get - leading us to numerical differential equations: the methodology for numerically approximating the values of the integrated variable within the bounds of the domain of interest.  
 
+## Ordinary Differential Equations
 To get an idea of how these methods work, we will first limit the discussion to only ordinary differential equations (ODE), meaning that the derivative is dependant on a single variable, such as time in the above examples. We will also start with first order derivatives, for which we will give the general form of
 
 $\dfrac{d y(t)}{d t} = f(t, y(t))$  
@@ -103,7 +106,7 @@ With all that said, lets get started!
 
 # ╔═╡ 02ddc60a-38fe-40ec-b53e-0f67e4058555
 md"""
-## The "numerics" in numerical differential equations 
+# The "numerics" in numerical differential equations 
 ### (or how do we approximate the solutions to differential equations using computers)
 We will go over 3 of the basic ODE solution methods and some of their features, then use them to solve some problems.  The methods are:
 * Forward Euler
@@ -114,7 +117,7 @@ We will go over 3 of the basic ODE solution methods and some of their features, 
 
 # ╔═╡ 52b8b183-c11c-4ed4-a87c-6ade5d0cab3f
 md"""
-#### Forward Euler
+## Forward Euler
 
 The forward Euler method is the most fundamental numerical differential equation method for solving ODEs with an initial value (know as Initial Value Problems, or IVP for short).  It works by using the fact that the derivative describes the slope of any tangential line to the unknown solution function. Assuming that the slope does not change 'too' much within a small interval, we can take small 'steps' along the tangent lines one by one. This draws a function that, with small enough steps, will approximate the unknown solution function. \
 
@@ -277,7 +280,7 @@ end
 
 # ╔═╡ 7b6262e0-ddcf-49cb-9915-371e9a51d377
 md"""
-#### Backwards Euler
+## Backwards Euler
 Using the same logic as the forward Euler method, instead of taking the slope of the current step, we could instead take the slope of the next step to approximate the next value.\
 
 Mathematically, this can be expressed as:\
@@ -333,9 +336,9 @@ TikzPicture(L"""
 
 # ╔═╡ d418ef42-cf94-4a90-8945-2b55f72841fc
 md"""
-The backward Euler method is considered an 'implicit' method (and often called implicit Euler) as the solutions for the next step, $y_{n+1}$, depend on itself (as the variable passed to derivative function is, $f(t_{n+1}, y_{n+1})$). In contrast, the forward Euler method is considered an 'explicit' method as the solutions for $y_{n+1}$ depends only on previously known values.  
+The backward Euler method is considered an 'implicit' method (and often called implicit Euler) as the solutions for the next step, $y_{n+1}$, depend on itself (as the variable passed to the derivative function, $f(t_{n+1}, y_{n+1})$, contains $y_{n+1}$), which is not yet know. In contrast, the forward Euler method is considered an 'explicit' method as the solutions for $y_{n+1}$ depends only on previously known values.  
 
-This means that the implicit method has an additional requirement of finding the solution to the unknown $y_{n+1}$, which is equivalent to finding the solution to the equation $y_{n+1} - y{n} - \Delta t \cdot f(t_{n+1}, y_{n+1}) = 0$. In general, this equation is not solvable analytically (except for specific simple functions, $f$) so we typically find its solution using an iterative method such as the "Newton–Raphson method".  This might seem like a lot of extra effort for no obvious gains, but implicit method have a significant advantage in some circumstances, which we will touch on later.
+This means that the implicit method has an additional requirement of finding the solution to the unknown $y_{n+1}$, which is equivalent to finding the solution to the equation $y_{n+1} - y{n} - \Delta t \cdot f(t_{n+1}, y_{n+1}) = 0$. In general, this equation is not solvable analytically (except for specific simple functions, $f$) so we typically find its solution using an iterative method such as the "Newton–Raphson method".  This might seem like a lot of extra effort for no obvious gain, but implicit methods have a significant advantage in some circumstances, which we will touch on later.
 
 Now, lets have a look at this method in code:
 """
@@ -353,7 +356,7 @@ function backward_euler(f, t0, tend, y0, n)
     for i in 1:n
 		t[i+1] = t[i] + dt
         # Define the non-linear function for finding y_next
-        funk(y_next) = y_next - y[i] - dt * f(t[i+1], y_next)
+        funk(ynpo) = ynpo - y[i] - dt * f(t[i+1], ynpo)
 		# Find the roots to the non-linear function
 		sol = nlsolve(x -> funk(x[1]), [y[i]], method = :newton)
 		# Update y[i+1]
@@ -365,7 +368,7 @@ end;
 
 # ╔═╡ 8fa9d555-cb04-4124-91a6-0db8ddf54cb0
 md"""
-#### Midpoint method
+## Midpoint method
 Before we check how this works with the sinusoidal function, we will visit is last method of this talk, the explicit Midpoint method.  Instead of using the slope of the tangent at the current or the next step, it uses the point in the middle, i.e. at $(t_{n}+t_{n+1}) / 2$.  To find the slope at this point, we need the value of the function, which we can find using a 'forward' (explicit) step, or a 'backwards' (implicit) step.  To keep things simple, we will just focus on the explicit approach.  
 
 Mathematically, this can be expressed as:\
@@ -449,7 +452,7 @@ end;
 
 # ╔═╡ dcdb7a33-ada9-4cce-9d31-a03c37681747
 md"""
-### Comparing the methods
+## Comparing the methods
 Now that we have all three methods defined, lets compare how they work using the sinusoidal function we used to inspect the Euler method.
 """
 
@@ -484,7 +487,7 @@ end
 
 # ╔═╡ 8bb39f85-ee52-4d5b-bbaa-3489315b0c13
 md"""
-### Stability
+## Stability
 
 Lets try solving a different ODE now.  We will use the an exponentially decaying function.  As a reminder, the exponential function is a function whose derivative is itself.  To make it decaying, we can set the derivative to be the negative value of itself. i.e.\
 $\dfrac{d y}{d t} = -y(t)$
@@ -512,7 +515,7 @@ f_exp(t, y0) = y0 * exp(-t);
 begin
 	tend_exp=20
 	t0_exp = 0
-	y0_exp = 1
+	y0_exp = 5
 	t_fe_exp, y_fe_exp = forward_euler(df_exp, t0_exp, tend_exp, y0_exp, n_exp) 
 	t_be_exp, y_be_exp = backward_euler(df_exp, t0_exp, tend_exp, y0_exp, n_exp) 
 	t_em_exp, y_em_exp = explicit_midpoint(df_exp, t0_exp, tend_exp, y0_exp, n_exp) 
@@ -521,7 +524,7 @@ end;
 # ╔═╡ 9cdc451f-735c-4722-acd5-fc3ab91b62c4
 let 
 plot(0:0.05:tend_exp, 
-     [t -> f_exp(t, 1)], # y 
+     [t -> f_exp(t, y0_exp)], # y 
      label="f(t) = y0 e^{-t}",
      legend=:topright,
 	 # legend_columns=-1,
@@ -642,251 +645,6 @@ plot(0:0.05:time,
 plot!(0:1:time, (t) -> forward_euler(f, 0, time, 1, steps)[2][round(Int, t*steps/time) + 1], label="Forward Euler", color=:orange, linewidth=3)
 end
   ╠═╡ =#
-
-# ╔═╡ 85586570-c28a-4ad8-bb9b-2001f0917097
-md"""
-## Partial differential equations
-
-Most problem we solve in physics and engineering are more involved than the IVP we looked at until now as they involve derivatives not only in time, but also in space.
-
-Differential equations involving more than one independent variable (in this case, space and time) leads to what is known as partial differential equations (PDE), and can have its derivatives with respect to multiple variables. Most commonly, the PDEs we are interested in describe changes in both time and space. These can describe anything from the pressure of a fluid particle to the charge of an electron to the positions of planets, the mutation of a biological cells, the crystallisation of chemical compounds, the spin of fundamental particles, the amount of carbon dioxide in the atmosphere, the ... you get the point.  Almost every physical system can be expressed in terms of a partial differential equation, with quantities that change with respect to both time and space.
-
-A good first example, which we will use as a test case, is the bulk motion of a (idealised) fluid, described by the "advection equation" which takes the form of a first order PDE:\
-$\dfrac{\partial u}{\partial t} = -c \dfrac{\partial u}{\partial x}$
-
-This equation describes that the changes to the fluid velocity in time, $\dfrac{\partial u}{\partial t}$ is related to the change of the fluid's velocity in space moving by the speed in which it moves, $c$, thus preserving its shape.  We can think of this as the way that a wave can carry an object, like a surfer, with it.
-
-Another prominent example is the diffusion of heat, described by the "heat equation", which takes a form of a second-order in space, first order in time PDE: \
-
-$\dfrac{\partial T}{\partial t} = \alpha \Delta T$\
-
-where $T$ in this example is the temperature and $\Delta$ is a second-order derivative in space, known as the Laplacian (to be exact, it is the divergence of the gradient of a scalar field in Euclidean space). This equation describes how heat spreads throughout space with time (like how your bath is hotter closer to the tap when you just filled it, and equally warm throughout after some time). For now, we will only investigate the advection equation, but in a subsequent talk will visit the heat equation and use it to investigate more advanced methods for the simulation of PDEs.
-
-The key concept to understand is that to solve these PDEs, we need not only to numerically integrate the differential equation in small steps through time, as we have done up to now, but to also express the derivative in space in a similar way: discretising space into "segments".  There are **many** ways of doing this and the choice of which method will depend on the specific problem we are trying to solve (with the best approach being a matter of many arguments!).  A relatively simple approach that follows a similar logic to the methods for IVP ODE that we looked at previously is the Finite Difference Method.
-
-## The Finite Difference Method
-As in all numerical methods, the spatial derivative is divided in space into discrete points, spaced apart by some width, $\Delta x$, just like we did for time. However, unlike for the time derivative, we do not advance in in space bit by bit, but rather we need to evaluate its derivate for *all* the points in space at a single point in time. Then, the whole space then advances in time - which is what our equations describe. This also means that for the spatial derivative, we do not require an initial value. But, there will be something else that we need - this will become clear in a moment.
-
-The Finite Difference Method, or FDM for short, is a specific methodology for how we approximate the values of the derivative at all these points. The principle for this method is that we use the difference between the values of the points relative to the distance between the points to approximate the derivative.
-
-Similarly to the forward Euler, backward Euler and midpoint methods we used for solving the IVP ODE, we have a range of choices on which points we can use to approximate the derivative.  For this talk we will limit the ourselves to two common choices, the backward difference scheme and the central differenc scheme. For simplicity, we will also limit ourselves to only one-dimensional problems, which means that our values only change with respect to length, but not with respect to area or volume, and to first-order PDEs.
-
-### Backward difference scheme
-In the backward difference scheme, we use the difference between the value at the current point and the single point "before" it, and divided it by the distance between the points to approximate the derivative *at the current point*. Sounds simple enough, but lets have a look at this pictorially:
-"""
-
-# ╔═╡ 71768cd5-5d12-4d48-8725-a4cfd0a9a8f0
-TikzPicture(L"""
-% Axes
-\draw[->, line width=1.2mm] (-0.5, 0) -- (4.5, 0) node[below, font=\fontsize{25}{30}] {$x$};
-\draw[->, line width=1.2mm] (0, -0.5) -- (0, 2.5) node[left, font=\fontsize{25}{30}] {$u$};
-
-% Smooth function x(x) = 0.2x^2
-\draw[thick, blue, domain=0.5:3.5, smooth, variable=\x, line width=1mm] 
-    plot ({\x}, {0.2*\x^2}) node[right, font=\fontsize{25}{30}] {$U(x)$};
-
-% Grid points (smaller)
-\foreach \x in {1,2,3} {
-    \fill[black] (\x, {0.2*\x^2}) circle (3pt);
-}
-
-% Labels for points
-\node[font=\fontsize{25}{30}] at (1, -0.2) {$x_{i-1}$};
-\node[font=\fontsize{25}{30}] at (2, -0.2) {$x_i$};
-\node[font=\fontsize{25}{30}] at (3, -0.2) {$x_{i+1}$};
-
-% Delta x annotations
-\draw[<->, line width=1mm] (1, -0.4) -- (2, -0.4) node[midway, below, font=\LARGE] {$\Delta x$};
-\draw[<->, line width=1mm] (2, -0.4) -- (3, -0.4) node[midway, below, font=\LARGE] {$\Delta x$};
-
-\node[font=\fontsize{25}{30}, above, yshift=8pt, xshift=-35pt] at (1, 0.2) {$u_{i-1}$};
-\node[font=\fontsize{25}{30}, right, xshift=15pt] at (2, 0.8) {$u_{i}$};
-\node[font=\fontsize{25}{30}, right, yshift=2pt, xshift=15pt] at (3, 1.8) {$u_{i+1}$};
-
-% Backward difference slopes
-\draw[dashed, green, line width=1mm] (1, 0.2) -- (2, 0.8) 
-    node[midway, above, sloped, font=\fontsize{25}{30}] 
-    {$\frac{\partial u_i}{\partial x_i} \approx \frac{u_i - u_{i-1}}{\Delta x}$};
-
-% Extend the approximate derivative slope
-\draw[dashed, yellow, line width=0.4mm] (2, 0.8) -- (3, 1.4);
-
-% Tangent line at u_i
-\draw[dashed, purple, line width=1mm] (1, 0) -- (3, 1.6) 
-    node[midway, below, sloped, font=\Huge] 
-    {$\left. \frac{\partial u}{\partial x} \right|_{x_i}$};
-
-
-""", options="scale=5.0", preamble="")
-
-
-# ╔═╡ da95e418-a336-4324-aef3-fb9d27882db3
-md"""
-
-You might notice that the approximation of the derivative, depicted by the slope of the tangent, is a bit wrong. However, if we imagine moving the points closer and closer together, the approximation will get closer to the actual value.  We can also notice that we have just 2 point - this means that we can only describe linear changes within this specific segment of space.
-
-Mathematically, we can write this as:
-
-$\dfrac{\partial u}{\partial x} \approx \dfrac{u_i - u_{i-1}}{\Delta x}$
-
-If you look at this formula closely, you might notice there is a real problem here. When we look at our first point, $U_0$, to find its derivative we need to look at the previous point, but this doesn't exist!  This is because we are missing some crucial information: what happens at the boundaries.
-
-Similarly to the IVP that requires an initial condition, for the derivative with respect to space we require information for what happens at its boundaries - known boundary condition.  Hence, these class of problems are called Boundary Value Problems, or BVP for short.  Generally, most problems we solve in physics and engineering will involve the combination of both IVP and BVP in a single PDE.
-
-To keep things at the boundaries simple, we will only consider periodic boundaries for now.  This means that we assigning the value for our missing point, $u_{-1}$ in the backward scheme, as the last value on the other side of the domain, $u_{nx}$, where $nx$ is the total number of points in our 1D domain.
-
-This might seem a bit complicated, but in fact the code for this is rather simple.  Lets have a look:
-"""
-
-# ╔═╡ f5056d49-9e58-456f-a6d9-0abea461a1f6
-function finite_difference_upwind_periodic(u, dx)
-    nx = length(u)
-    dudx = zeros(nx)
-
-    for i in 2:nx
-        dudx[i] = (u[i] - u[i-1]) / dx
-    end
-
-    # Periodic boundary condition
-    dudx[1] = (u[1] - u[nx]) / dx
-
-    return dudx
-end;
-
-# ╔═╡ 61b795f9-2661-4e3e-9705-1d0ec42b84cd
-md"""
-We will try this code to approximate the advection equation momentarily, but first lets try to improve the approximation of the derivative.  To do this, we will introduce the central difference scheme.
-
-### Central difference
-In order to obtain a more accurate approximation of the derivative than what we got with backward difference, we can look at both the point ahead of the current point and the point behind the current point, then take the difference between them and divide it by *their* distance, which is now $2 \Delta x$ (at least with an evenly spaced grid).  This is somewhat similar to what we did with the midpoint rule, which we saw dramatically improved our accuracy. Lets have a check how this looks graphically.
-"""
-
-# ╔═╡ 3e1f3fcc-4991-4f17-b465-63db10e2ad15
-TikzPicture(L"""
-% Axes
-\draw[->, line width=1.2mm] (-0.5, 0) -- (4.5, 0) node[below, font=\fontsize{25}{30}] {$x$};
-\draw[->, line width=1.2mm] (0, -0.5) -- (0, 2.5) node[left, font=\fontsize{25}{30}] {$u$};
-
-% Smooth function u(x) = 0.2x^2
-\draw[thick, blue, domain=0.5:3.5, smooth, variable=\x, line width=1mm] 
-    plot ({\x}, {0.2*\x^2}) node[right, font=\fontsize{25}{30}] {$u(x)$};
-
-% Grid points (smaller)
-\foreach \x in {1,2,3} {
-    \fill[black] (\x, {0.2*\x^2}) circle (3pt);
-}
-
-% Labels for points
-\node[font=\fontsize{25}{30}] at (1, -0.2) {$x_{i-1}$};
-\node[font=\fontsize{25}{30}] at (2, -0.2) {$x_i$};
-\node[font=\fontsize{25}{30}] at (3, -0.2) {$x_{i+1}$};
-
-% Delta x annotations
-\draw[<->, line width=1mm] (1, -0.4) -- (2, -0.4) node[midway, below, font=\LARGE] {$\Delta x$};
-\draw[<->, line width=1mm] (2, -0.4) -- (3, -0.4) node[midway, below, font=\LARGE] {$\Delta x$};
-
-\node[font=\fontsize{25}{30}, above, yshift=8pt, xshift=-35pt] at (1, 0.2) {$u_{i-1}$};
-\node[font=\fontsize{25}{30}, right, xshift=15pt] at (2, 0.8) {$u_{i}$};
-\node[font=\fontsize{25}{30}, right, yshift=2pt, xshift=15pt] at (3, 1.8) {$u_{i+1}$};
-
-% Center difference slopes
-\draw[dashed, green, line width=1mm] (1, 0.2) -- (3, 1.8) 
-    node[midway, above, sloped, font=\Huge] 
-    {$\frac{\partial u_i}{\partial x_i} \approx \frac{u_{i+1} - u_{i-1}}{2\Delta x}$};
-
-% Tangent line at u_i
-\draw[dashed, purple, line width=1mm] (1, 0) -- (3, 1.6) 
-    node[midway, below, sloped, font=\Huge] 
-    {$\left. \frac{\partial u}{\partial x} \right|_{x_i}$};
-
-
-""", options="scale=5.0", preamble="")
-
-
-# ╔═╡ 490d0a20-c9d3-4209-ad4a-4a90793d7b0f
-md"""
-We can see that the slope of the curve is now a much closer approximation, and indeed the central scheme produces more accurate results.  But we can also notice that the distance between the points is larger, which means that we capture changes at a larger interval as well so we could face issues if there is significant changes within that space.  
-
-Mathematically, we can write this approach as:\
-$\dfrac{\partial u}{\partial x} \approx \dfrac{u_{i+1} - u_{i-1}}{2\Delta x}$
-
-You might notice that we now face the problem with the missing values on both sides. However, as we are using periodic boundaries, we can just do what we did in the backwards scheme on the other side, treating the *next point* of the last point, $u_{nx+1}$ as the first point, i.e. $u_0$.
-
-Now lets look at this in code:
-"""
-
-# ╔═╡ 2c495e18-ec8e-47b2-929b-0fb07dc18435
-function finite_difference_central_periodic(u, dx)
-    nx = length(u)
-    dudx = zeros(nx)
-
-    # Interior points
-    for i in 2:nx-1
-        dudx[i] = (u[i+1] - u[i-1]) / (2 * dx)
-    end
-
-    # Periodic boundary conditions
-    dudx[1]  = (u[2] - u[nx]) / (2 * dx)   # First point
-    dudx[nx] = (u[1] - u[nx-1]) / (2 * dx) # Last point
-
-    return dudx
-end;
-
-# ╔═╡ cfe51b6e-2405-4b13-a2c8-9f7a63067e28
-md"""
-With these methods now available to us, lets go ahead and solve the advection equation with the FDM.
-
-First, lets recall the advection equation.\
-
-$\dfrac{\partial u}{\partial t} = -c \dfrac{\partial u}{\partial x}$\
-
-We already have a suitable solver for the numerical time integration of the left hand side of this equation in the explicit midpoint method for systems of equations. What we need now is to write a function for the right hand side using one of our finite difference schemes for the space derivative:
-"""
-
-# ╔═╡ ca04d7a4-dfde-4119-814f-f3e35c3f8fc4
-function f_advection(t, u, dx, c, space_derivative)
-    return -c * space_derivative(u, dx)
-end;
-
-# ╔═╡ 50ed0002-bc70-46b9-b46c-2bf942608e92
-md"""
-Now lets set up our problem.  First, we need to set our initial condition, i.e. what is the initial values of the velocity at time 0.  To keep things simple and familiar, lets use the sinistral function for this, $u(0,x) = sin(x)$.
-We will apply this function over 2 periods, so the bounds of our space will be $0 < x < 2π$, and as we are using periodic boundaries we don't need to set anything at the end points.  We also need to decide how fast the wave will advect.  Lastly we need to set up at what time it will start and for how long we wish to simulate it.
-"""
-
-# ╔═╡ 200047f7-7724-49b4-9954-9d5628f133f7
-# Wave speed
-@bind c Slider(0.1:0.1:4, show_value=true, default=1)
-
-# ╔═╡ 850c4a5d-0182-46d9-a6c3-87af9282cbfb
-@bind nx Slider(10:10:1000, show_value=true, default=10)
-
-# ╔═╡ f824fc1a-7975-4fb7-af07-4c6359ff061c
-@bind n_adv Slider(10:10:5000, show_value=true, default=200)
-
-# ╔═╡ 2d12e9e2-dcdc-470a-ab15-ac55ab1eb6fa
-@bind tend_adv Slider(0:π/10:10*π, show_value=true, default=0)
-
-# ╔═╡ cea7eafd-a061-47c8-809c-718134107625
-begin
-	# Grid and initial condition
-	x = LinRange(0, 2π, nx)  # Domain from 0 to 2π
-	dx_adv = x[2] - x[1]     # Space between points (spatial resolution)
-	u0_adv = sin.(x)         # Initial sine wave
-	t0_adv = 0               # Start time
-	
-	# Solve using explicit midpoint and periodic finite differences
-	t_up, u_up = explicit_midpoint_system((t, u) -> f_advection(t, u, dx_adv, c, finite_difference_upwind_periodic), t0_adv, tend_adv, u0_adv, n_adv)
-	t_cen, u_cen = explicit_midpoint_system((t, u) -> f_advection(t, u, dx_adv, c, finite_difference_central_periodic), t0_adv, tend_adv, u0_adv, n_adv)
-end;
-
-# ╔═╡ 80475362-e5cb-4a68-a62f-bac869b9ff30
-begin
-	# Plot results
-	plot(x, u0_adv, label="Initial", linestyle=:dash, linewidth=2,xlabel="space", ylabel="velocity", title="Advection equation")
-	plot!(x, u_up[:,end], label="Backward Difference", linewidth=3)
-	plot!(x, u_cen[:,end], label="Central Difference", linewidth=2)
-end
 
 # ╔═╡ 02d31381-72bd-41c3-a675-367d9f04c7ea
 # ╠═╡ disabled = true
@@ -2544,7 +2302,7 @@ version = "1.4.1+2"
 """
 
 # ╔═╡ Cell order:
-# ╠═b47bed71-9c24-40b3-af34-290aebf0d19c
+# ╟─b47bed71-9c24-40b3-af34-290aebf0d19c
 # ╟─81cd2b9c-d1a3-11ef-3318-7dc0cf57198c
 # ╟─37635ba2-6454-4cc7-b6b5-39a6b3ba5540
 # ╟─6224fb35-8a3c-4fcd-8dac-33d0e26125ad
@@ -2584,7 +2342,7 @@ version = "1.4.1+2"
 # ╠═f8279035-637f-4991-9947-13d5cf02b83b
 # ╠═ab1d6667-a57f-4d6c-a8e1-6a2e470c58d9
 # ╠═9cdc451f-735c-4722-acd5-fc3ab91b62c4
-# ╟─e39eb891-d858-4294-9dd4-c02d068b1dc3
+# ╠═e39eb891-d858-4294-9dd4-c02d068b1dc3
 # ╠═e8dd2af7-1f0e-499f-a274-1613d79a28d4
 # ╠═4c8b6895-16d5-4a5a-aac2-8f806bfb4f9f
 # ╠═892714ec-1bf1-42da-b2f5-84090a326654
@@ -2594,23 +2352,6 @@ version = "1.4.1+2"
 # ╠═82acd74a-268e-4ccc-8889-6175364e955f
 # ╟─d18e6dea-edeb-4838-914f-6f86eba29916
 # ╟─ae8aa528-345d-4ec1-95f3-382667e13e66
-# ╟─85586570-c28a-4ad8-bb9b-2001f0917097
-# ╟─71768cd5-5d12-4d48-8725-a4cfd0a9a8f0
-# ╟─da95e418-a336-4324-aef3-fb9d27882db3
-# ╠═f5056d49-9e58-456f-a6d9-0abea461a1f6
-# ╟─61b795f9-2661-4e3e-9705-1d0ec42b84cd
-# ╟─3e1f3fcc-4991-4f17-b465-63db10e2ad15
-# ╟─490d0a20-c9d3-4209-ad4a-4a90793d7b0f
-# ╠═2c495e18-ec8e-47b2-929b-0fb07dc18435
-# ╟─cfe51b6e-2405-4b13-a2c8-9f7a63067e28
-# ╠═ca04d7a4-dfde-4119-814f-f3e35c3f8fc4
-# ╟─50ed0002-bc70-46b9-b46c-2bf942608e92
-# ╠═cea7eafd-a061-47c8-809c-718134107625
-# ╠═200047f7-7724-49b4-9954-9d5628f133f7
-# ╠═850c4a5d-0182-46d9-a6c3-87af9282cbfb
-# ╠═f824fc1a-7975-4fb7-af07-4c6359ff061c
-# ╠═2d12e9e2-dcdc-470a-ab15-ac55ab1eb6fa
-# ╟─80475362-e5cb-4a68-a62f-bac869b9ff30
 # ╟─02d31381-72bd-41c3-a675-367d9f04c7ea
 # ╟─1ffe20fa-e910-484e-992b-8e1160f68086
 # ╟─00000000-0000-0000-0000-000000000001
