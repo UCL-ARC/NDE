@@ -93,7 +93,10 @@ where $u(t)$ is the speed, $e(t)$ is the engine input accelerating the vehicle, 
 Even though each of these pieces makes sense on its own, combining them into one equation creates something far too complicated to integrate by hand. The speed depends on the position, and the position also depends on the speed, and the traffic term introduces another layer of feedback. Everything affects everything else at once.  Equations like this simply do not have a neat formula we can write down, but are what we are actually trying to model.
 
 What we need then is some methodology for finding the values of the integral for whatever expression we get - leading us to numerical differential equations: the methodology for numerically approximating the values of the integrated variable within the bounds of the domain of interest.  
+"""
 
+# ╔═╡ 8105ced5-028d-4bb1-817c-2748dea9af9f
+md"""
 ## Ordinary Differential Equations
 To get an idea of how these methods work, we will first limit the discussion to only ordinary differential equations (ODE), meaning that the derivative is dependant on a single variable, such as time in the above examples. We will also start with first order derivatives, for which we will give the general form of
 
@@ -515,11 +518,44 @@ f_exp(t, y0) = y0 * exp(-t);
 begin
 	tend_exp=20
 	t0_exp = 0
-	y0_exp = 5
+	y0_exp = 1
+	
 	t_fe_exp, y_fe_exp = forward_euler(df_exp, t0_exp, tend_exp, y0_exp, n_exp) 
 	t_be_exp, y_be_exp = backward_euler(df_exp, t0_exp, tend_exp, y0_exp, n_exp) 
 	t_em_exp, y_em_exp = explicit_midpoint(df_exp, t0_exp, tend_exp, y0_exp, n_exp) 
 end;
+
+# ╔═╡ 70df97ce-e91d-4700-936c-3011604ef852
+md"""
+Now, lets have a look at our different methods. To begin with, we are using 15 steps, which gives as a rather large step size as indicated by the step size counter above the plot.  The step size is 1.33, which means that we are striding forward at intervals of 1.33 units (in this case, of time).
+
+Lets go step by step with the two different Euler methods. With the Forward Euler method, this means that for the first interval, we are moving from $y_0=1$ by $\Delta t \cdot -y$, which means we are moving by $-1.33$ as the slope at t=0 is $-y_0$ which is -1, so we are now at $-0.33$!  We really overshot where we should be.  
+
+With the backwards Euler, we use the slope at $t=1.33$, which happens to be $-y(1.33)$. We don't know the value yet, but we can find it by solving the equation
+$y_1 = y_0 + \Delta t \cdot -y_1 \Rightarrow y_1 = 1/2.33 = 0.4286$
+
+This is still an overestimate compared to the exact solution $y(1.33) = e^{-1.33} \approx 0.26$, but at least it's moving in the right direction and stays positive!
+
+If we take further steps like this with both methods, we'll see that the Forward Euler method oscillates up and down before eventually converging, while the Backward Euler method smoothly decays toward the solution without oscillations.
+
+Now, let move the slider down to 10 steps.  In this case, the oscillations in the Forward Euler method got so big, that it can no longer recover and get closer to the real solution, it just goes back and forth endlessly!  However, the Backwards Euler doesn't have this issue, and while it has significant errors, it does eventually still reach the right solution even with so few steps.  You can try and do these steps by hand and see what happens.  We can also see that something strange is happening with the Explicit midpoint method - it also got stuck and just remains as a straight line.  It is a little harder to intuitively follow what it is doing, but by working out its steps one by one it will become clear.
+
+Now, let's move the slider even further to the left so it goes under 10 steps.  In this case we can see that the Forward Euler method (and the Explicit midpoint method) just explode!  This is called divergence; when the method have errors that instead of shrinking and eventually getting closer to the solution, grow and grow indefinitely.
+
+Lastly, lets move the slider to the right and increase the number of steps more and more.  Eventually we'll see the familiar behaviour where the errors of the Forward and Backward method are similar and the Explicit midpoint method is more accurate.  This is the expected behaviour when the steps are small enough to avoid overshooting the solution by an unrecoverable amout!
+
+What we just witnessed here is called the stability of the method. While the rate at which the Forward and Backward Euler methods converge is the same, their stability is in fact very different. This is a general trend for implicit and explicit methods: explicit methods are simpler and faster to solve, but require smaller steps to stay stable, while implicit methods are more complicated and require solving an additional equation, but are unconditionally stable and can still work even with large steps!  This can be very advantagious as in some cases the number of steps we would need to make the explicit method stable are more than we can computationally afford and our only option becomes using implicit methods.
+"""
+
+# ╔═╡ 706f402f-4092-4982-87a7-75f6e9378c73
+  begin
+  	current_dt = (tend_exp - t0_exp) / n_exp
+
+  	md"""
+  	**Step size:**
+  	Δt = $(round(current_dt, digits=2))
+  	"""
+  end
 
 # ╔═╡ 9cdc451f-735c-4722-acd5-fc3ab91b62c4
 let 
@@ -2306,6 +2342,7 @@ version = "1.4.1+2"
 # ╟─81cd2b9c-d1a3-11ef-3318-7dc0cf57198c
 # ╟─37635ba2-6454-4cc7-b6b5-39a6b3ba5540
 # ╟─6224fb35-8a3c-4fcd-8dac-33d0e26125ad
+# ╟─8105ced5-028d-4bb1-817c-2748dea9af9f
 # ╟─02ddc60a-38fe-40ec-b53e-0f67e4058555
 # ╟─52b8b183-c11c-4ed4-a87c-6ade5d0cab3f
 # ╟─6e3f6eab-6c50-4775-80c8-5049c469433a
@@ -2341,8 +2378,10 @@ version = "1.4.1+2"
 # ╠═f89cea13-7da2-4a5b-bc5d-6069076726a2
 # ╠═f8279035-637f-4991-9947-13d5cf02b83b
 # ╠═ab1d6667-a57f-4d6c-a8e1-6a2e470c58d9
+# ╟─706f402f-4092-4982-87a7-75f6e9378c73
 # ╠═9cdc451f-735c-4722-acd5-fc3ab91b62c4
-# ╠═e39eb891-d858-4294-9dd4-c02d068b1dc3
+# ╟─70df97ce-e91d-4700-936c-3011604ef852
+# ╟─e39eb891-d858-4294-9dd4-c02d068b1dc3
 # ╠═e8dd2af7-1f0e-499f-a274-1613d79a28d4
 # ╠═4c8b6895-16d5-4a5a-aac2-8f806bfb4f9f
 # ╠═892714ec-1bf1-42da-b2f5-84090a326654
