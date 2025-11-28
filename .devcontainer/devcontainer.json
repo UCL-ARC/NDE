@@ -1,6 +1,6 @@
 {
     "name": "Pluto notebook",
-    "image": "ghcr.io/qiuip/nde:main",
+    "image": "ghcr.io/ucl-arc/nde:main",
 
     "customizations": {
 	"vscode": {
