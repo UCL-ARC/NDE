@@ -6,10 +6,10 @@ FROM julia:${JULIA_VERSION}
 
 ARG JULIA_VERSION
 
-# Install git, for use within Codespaces, and lualatex+tikz
+# Install git, for use within Codespaces, and pdf2svg
 RUN /bin/sh -c 'export DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
-    && apt-get install -y git texlive-latex-base texlive-pictures \
+    && apt-get install -y git pdf2svg \
     && apt-get --purge autoremove -y \
     && apt-get autoclean \
     && rm -rf /var/lib/apt/lists/*'
