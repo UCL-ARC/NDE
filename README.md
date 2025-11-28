@@ -90,7 +90,7 @@ Once Pluto is running, click on `NDE.jl` in the Pluto interface to open the note
 
 ### Option 3: Native Julia Installation  (Recommended for Local Use)
 
-**Prerequisites:** [Julia 1.11+](https://julialang.org/downloads/) installed
+**Prerequisites:** [Julia 1.12+](https://julialang.org/downloads/) installed
 
 ```bash
 # Clone the repository
@@ -98,11 +98,12 @@ git clone https://github.com/UCL-ARC/NDE.git
 cd NDE
 
 # Start Julia
-julia
-
-# In the Julia REPL, install and start Pluto
+julia --project
+```
+Then, in the Julia REPL, install and start Pluto
+```julia-repl
 julia> using Pkg
-julia> Pkg.add("Pluto")
+julia> Pkg.instantiate()
 julia> using Pluto
 julia> Pluto.run()
 ```
@@ -112,7 +113,7 @@ When Pluto opens in your browser, navigate to and open `NDE.jl`.
 **Alternative (one-liner):**
 
 ```bash
-julia -e 'using Pkg; Pkg.add("Pluto"); using Pluto; Pluto.run()'
+julia --project -e 'using Pkg; Pkg.instantiate(); using Pluto; Pluto.run()'
 ```
 
 ---
