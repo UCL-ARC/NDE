@@ -15,7 +15,7 @@ on:
       - 'Dockerfile'
       - 'Project.toml'
       - 'julia_cpu_target.sh'
-      - 'NDE'
+      - 'NDE.jl'
   pull_request:
     branches: [ "main" ]
     paths:
@@ -23,7 +23,7 @@ on:
       - 'Dockerfile'
       - 'Project.toml'
       - 'julia_cpu_target.sh'
-      - 'NDE'
+      - 'NDE.jl'
 
 env:
   REGISTRY: ghcr.io
