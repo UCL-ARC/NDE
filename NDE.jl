@@ -80,7 +80,7 @@ We can solve these kind of equations relatively easily on paper when we can obta
 
 $\dfrac{dx}{dt} = \cos(t)$\
 
-which has a know solution in the sinusoidal function
+which has a known solution in the sinusoidal function
 
 $x(t) = \sin(t)$
 
@@ -141,7 +141,7 @@ Lets inspect this with an example.  Given an ODE \
 $y'(t) = \dfrac{dy(t)}{dt} = t, \quad y(0) = 1$ \
 which has a known solution \
 $y(t) = 0.5 t^2 + 1$
-we will apply a couple steps of the forward Euler method to try and find the know solution.
+we will apply a couple steps of the forward Euler method to try and find the known solution.
 
 """
 
