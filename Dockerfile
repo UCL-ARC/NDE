@@ -1,10 +1,15 @@
 # syntax=docker/dockerfile:1
-FROM julia:1.11.3
 
-# Install git, for use within Codespaces
+ARG JULIA_VERSION=1.12
+
+FROM julia:${JULIA_VERSION}
+
+ARG JULIA_VERSION
+
+# Install git, for use within Codespaces, and lualatex+tikz
 RUN /bin/sh -c 'export DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
-    && apt-get install -y git \
+    && apt-get install -y git texlive-latex-base texlive-pictures \
     && apt-get --purge autoremove -y \
     && apt-get autoclean \
     && rm -rf /var/lib/apt/lists/*'
@@ -16,8 +21,8 @@ COPY julia_cpu_target.sh /julia_cpu_target.sh
 RUN julia --color=yes -e 'using InteractiveUtils; versioninfo()'
 
 # Instantiate Julia project
-RUN mkdir -p /root/.julia/environments/v1.11
-COPY Project.toml  /root/.julia/environments/v1.11/Project.toml
+RUN mkdir -p /root/.julia/environments/v${JULIA_VERSION}
+COPY Project.toml  /root/.julia/environments/v${JULIA_VERSION}/Project.toml
 RUN . /julia_cpu_target.sh && julia --color=yes -e 'using Pkg; Pkg.instantiate()'
 
 # Copy notebook
