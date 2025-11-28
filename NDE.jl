@@ -80,7 +80,7 @@ We can solve these kind of equations relatively easily on paper when we can obta
 
 $\dfrac{dx}{dt} = \cos(t)$\
 
-which has a know solutino in the sinusoidal function
+which has a know solution in the sinusoidal function
 
 $x(t) = \sin(t)$
 
