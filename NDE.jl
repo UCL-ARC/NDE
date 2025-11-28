@@ -57,19 +57,30 @@ A differential equation is an equation that describes these changes, from which 
 
 # ╔═╡ 37635ba2-6454-4cc7-b6b5-39a6b3ba5540
 md"""
-The most common derivative we use on a regular basis is probably 'speed', as in mile per hour, or $\mathrm{km}/\mathrm{h}$, which represents the distance, $x$, travailed with respect to time, $t$ which we write as $v = \dfrac{d x}{d t}$
+The most common derivative we use on a regular basis is probably 'speed', as in mile per hour, or $\mathrm{km}/\mathrm{h}$, which we will denote as $u$, and represents the distance, $x$, travailed with respect to time, $t$.  In equation form, it looks like this:
 
-If we then take the change in speed over time, we get acceleration, $a = \dfrac{d u}{d t} = \dfrac{d \frac{d x}{dt}} {d t} = \dfrac{d^2 x}{d t^2}$, giving us the relationship between distance, velocity and acceleration.\
-\
+$u(t) = \dfrac{d x(t)}{d t}$
 
-In many cases, we have information about the derivative, but not the derived value.  For example, we can might keep track of how fast we drive and for how long, but not track how far.  To find that, we can solve a *simple* differential equation: \
-$\displaystyle \dfrac{d x(t)}{dt} = u(t) \Rightarrow \int_{t_0}^{t_n} \dfrac{d}{dt} x(t) dt = \int_{t_0}^{t_n} u(t) dt \Rightarrow x(t) = \int_{t_0}^{t_n} u(t) dt + C_0$\
-which translates to "the distance travelled at time $t$ is equal to the integral of the velocity over the time travelled plus whatever the distance already was at the time we started measuring".  If the speed is constant, i.e. $u(t) = v$, this is trivial, the distance travelled is just the speed times the time.  This is exactly what the integral of a constant will give us:\
+Note that we added the time in brackets to indicate it is something that both the speed and the distance depend on. This expresses that this is a speed and distance are given at a specific time.
+If we then take the change in speed over time, we get acceleration, which as a differential equation looks like this: 
 
-$\displaystyle x(t) = \int_{t_0}^{t_n} v dt = v t + C_0$  
+$a(t) = \dfrac{d u(t)}{d t} = \dfrac{d \frac{d x(t)}{dt}} {d t} = \dfrac{d^2 x(t)}{d t^2}$
 
-Another very common differential equation we regularly use in physics and engineering is Newton's second law, $F = m \cdot a$, which we can write as: \
-$F(x(t)) = m \dfrac{d^2 x(t)}{dt^2}$
+giving us a relationship between distance, speed and acceleration.  We will use this relationship throughout this notebook. 
+
+In many real cases, we have information about the derivative, but not the derived value.  For example, we might keep track of how fast we drive and for how long, but not track for how far (think of all thoes primary school question like "a train left town A at time t and traveled for x time at speed y...").  To find that, we actually solve a *simple* differential equation:
+
+$\displaystyle \dfrac{d x(t)}{dt} = u(t) \Rightarrow \int_{t_0}^{t_n} \dfrac{d}{dt} x(t) dt = \int_{t_0}^{t_n} u(t) dt \Rightarrow x(t) = \int_{t_0}^{t_n} u(t) dt$\
+
+This roughly translates to "the distance travelled at time $t$ is equal to the sum of all the speed measurements times the duration at that speed over the total travelled duration".  If the speed is constant, i.e. it does not change in time and $u(t) = v$, this becomes trivial: the distance travelled is just the speed times the time (just like the primary school type questions).  This is exactly what the integral of a constant will give us:
+
+$\displaystyle x(t) = \int_{t_0}^{t_n} v dt = v t + C_0$ 
+
+where $C_0$ is some constant that in this case would represent the distance already traveled when we started measuring.
+
+Another very common differential equation we regularly use in physics and engineering is Newton's second law, $F = m \cdot a$, which we can write as:
+
+$F(x(t), t) = m \dfrac{d^2 x(t)}{dt^2}$
 """
 
 # ╔═╡ 6224fb35-8a3c-4fcd-8dac-33d0e26125ad
@@ -128,19 +139,22 @@ md"""
 
 The forward Euler method is the most fundamental numerical differential equation method for solving ODEs. For now, we will restrict the ODEs to ones that have an initial condition (know as Initial Value Problems, or IVP for short), which is a class of ODEs that are commonly used to model how a system evolves with time from an initial known state.
 
-The Forward Euler method works by using the fact that the derivative describes the slope of any tangential line to the unknown solution function. Assuming that the slope does not change 'too' much within a small interval, we can take small 'steps' along the tangent lines one by one. This draws a function that, with small enough steps, will approximate the unknown solution function. \
+The Forward Euler method works by using the fact that the derivative describes the slope of any tangential line to the unknown solution function. Assuming that the slope does not change 'too' much within a small interval, we can take small 'steps' along the tangent lines one by one. This draws a function that, with small enough steps, will approximate the unknown solution function.
 
+Mathematically, this can be expressed as:
 
-Mathematically, this can be expressed as:\
-$y_{n+1} = y_n + \Delta t \cdot f(t_n, y_n)$\
-
+$y_{n+1} = y_n + \Delta t \cdot f(t_n, y_n)$
 
 and in words as "the value at the next step is equal to the value at this step plus a small interval times the slope of the tangent at the current step".
 
-Lets inspect this with an example.  Given an ODE \
-$y'(t) = \dfrac{dy(t)}{dt} = t, \quad y(0) = 1$ \
-which has a known solution \
+Lets inspect this with an example.  Given an ODE
+
+$\dfrac{dy(t)}{dt} = t, \quad y(0) = 1$
+
+which has a known solution
+
 $y(t) = 0.5 t^2 + 1$
+
 we will apply a couple steps of the forward Euler method to try and find the known solution.
 
 """
@@ -219,8 +233,9 @@ md"""
 
 Lets try this method out using a function which we know the solution for, such as the previous example of a sinusoidal function.
 
-We define the differential equation as:\
-$\dfrac{dy(t)}{dt} = A \cos(\omega t)$ \
+We define the differential equation as:
+
+$\dfrac{dy(t)}{dt} = A \cos(\omega t)$
 
 where $t$ is time, $A$ is the amplitude of the oscillation and $\omega = \frac{2 \pi}{T}$ is the frequency converted from angles to radians (i.e. how many oscillations occur over a period of time) and $T$ is the period of the oscillations.
 
@@ -312,7 +327,8 @@ md"""
 ## Backwards Euler
 Using the same logic as the forward Euler method, instead of taking the slope of the current step, we could instead take the slope of the next step to approximate the next value.\
 
-Mathematically, this can be expressed as:\
+Mathematically, this can be expressed as:
+
 $y_{n+1} = y_n + \Delta t \cdot f(t_{n+1}, y_{n+1})$
 
 and in words as "the value at the next step is equal to the value at this step plus a small interval times the slope of the tangent at the next step".
@@ -400,7 +416,8 @@ md"""
 ## Midpoint method
 Before we check how this works with the sinusoidal function, we will visit is last method of this talk, the explicit Midpoint method.  Instead of using the slope of the tangent at the current or the next step, it uses the point in the middle, i.e. at $(t_{n}+t_{n+1}) / 2$.  To find the slope at this point, we need the value of the function, which we can find using a 'forward' (explicit) step, or a 'backwards' (implicit) step.  To keep things simple, we will just focus on the explicit approach.  
 
-Mathematically, this can be expressed as:\
+Mathematically, this can be expressed as:
+
 $y_{n+1} = y_n + \Delta t \cdot f\left(t_n + \frac{\Delta t}{2}, y_n + \frac{\Delta t}{2} \cdot f(t_n, y_n)\right)$
 
 and in words "the value at the next step is equal to the current value plus a small interval times the slope of the tangent at the mid-step, which we find using a forward step with half of the interval".
@@ -520,10 +537,12 @@ end
 md"""
 ## Stability
 
-Lets try solving a different ODE now.  We will use the an exponentially decaying function.  As a reminder, the exponential function is a function whose derivative is itself.  To make it decaying, we can set the derivative to be the negative value of itself. i.e.\
+Lets try solving a different ODE now.  We will use the an exponentially decaying function.  As a reminder, the exponential function is a function whose derivative is itself.  To make it decaying, we can set the derivative to be the negative value of itself. i.e.
+
 $\dfrac{d y(t)}{d t} = -y(t)$
 
-This function has the exact solution\
+This function has the exact solution
+
 $y(t) = y_0 \mathrm{e}^{-t}$
 
 Lets write these functions in code and compare how our numerical differential equation solvers approximate it.  We will evaluate the functions from $t=0$ up to $t=20$ and set the initial condition to $1$, i.e. $y(t=0) = y_0 = 1$.
@@ -605,19 +624,21 @@ What we just witnessed here is called the stability of the method. While the rat
 md"""
 ### Higher order differential equations
 
-The examples above are all of "first order" ODEs with initial value: this means the derivative we have on the left hand side of the equation is a first order derivative.  If you recall Newtown second law which we touched on at the start, $F = m \cdot a$ then the acceleration, $a$, is a second order derivative of displacement, i.e. 
+The examples above are all of "first order" ODEs with initial value: this means the derivative we have on the left hand side of the equation is a first order derivative.  If you recall Newtown second law which we touched on at the start, $F(t) = m \cdot a(t)$ and the relationship we expressed between the acceleration and the distance:
 
-$a(t) = \dfrac{du(t)}{dt} = \dfrac{d \dfrac{dx(t)}{dt}}{dt} = \dfrac{d^2 x(t)}{d t^2}$
+$a(t) = \dfrac{d^2 x(t)}{d t^2}$
 
-Now, if we want to find our displacement from the mass and the force we have applied over a period of time, we can rewrite the equation as:\
+we can express Newtown's law as:
+
 $\dfrac{d^2 x(t)}{d t^2} = \dfrac{F(t)}{m}$
 
 **Note that in this example we assume the force only depends on time and does not change (i.e. is constant) with respect to space!  This is important as we will see in a future presentation on the Finite Difference method.**
 
-To solve this second-order ODE, we typically decompose it into a system of first order ODEs as follows:\
-$\dfrac{d x(t)}{d t} = u(t)$ (This ODE will give us the displacement $x$)\
-\
-$\dfrac{d u(t)}{d t} = \dfrac{F(t)}{m} = a(t)$  (This ODE will give us the velocity $u$)
+To solve this second-order ODE, we typically decompose it into a system of first order ODEs as follows:
+
+$$\frac{d x(t)}{dt} = u(t) \quad \text{(ODE for the displacement $x(t)$)}$$
+
+$$\frac{d u(t)}{dt} = \frac{F(t)}{m} = a(t) \quad \text{(ODE for the velocity $u(t)$)}$$
 
 Notice that the first equation for solving the displacement depends on $u$, which we only get from solving the second equation. This means we must solve them in order.
 

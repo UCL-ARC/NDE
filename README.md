@@ -1,6 +1,6 @@
 # Intro to Numerical Differential Equations
 
-An interactive Pluto.jl notebook introducing the fundementals of numerical
+An interactive Pluto.jl notebook introducing the fundamentals of numerical
 methods for solving differential equations.
 
 Designed for a mixed background audience of Research Technical Professionals.
@@ -48,7 +48,7 @@ Several options are provided for interacting with the notebooks:
 3. Pluto will automatically start and open in your browser
 4. Click on `NDE.jl` to open the notebook
 
-**Note:** Codespaces provides 60 hours/month free for individual GitHub accounts (Need to verify!).
+**Note:** Codespaces provides 120 core-hours/month free for individual GitHub accounts.
 
 ---
 
