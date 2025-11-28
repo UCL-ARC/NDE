@@ -38,7 +38,7 @@ Please view it with this in mind.
 
 Several options are provided for interacting with the notebooks:
 
-### Option 1: GitHub Codespaces (Easiest - No Installation Required)
+### Option 1: GitHub Codespaces (Easiest - No Installation Required, but slow!)
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/UCL-ARC/NDE)
 
@@ -48,11 +48,11 @@ Several options are provided for interacting with the notebooks:
 3. Pluto will automatically start and open in your browser
 4. Click on `NDE.jl` to open the notebook
 
-**Note:** Codespaces provides 60 hours/month free for individual GitHub accounts.
+**Note:** Codespaces provides 60 hours/month free for individual GitHub accounts (Need to verify!).
 
 ---
 
-### Option 2: Docker (Recommended for Local Use)
+### Option 2: Docker
 
 **Prerequisites:** [Docker](https://www.docker.com/get-started) installed on your system
 
@@ -88,7 +88,7 @@ Once Pluto is running, click on `NDE.jl` in the Pluto interface to open the note
 
 ---
 
-### Option 3: Native Julia Installation
+### Option 3: Native Julia Installation  (Recommended for Local Use)
 
 **Prerequisites:** [Julia 1.11+](https://julialang.org/downloads/) installed
 
