@@ -57,7 +57,7 @@ A differential equation is an equation that describes these changes, from which 
 
 # ╔═╡ 37635ba2-6454-4cc7-b6b5-39a6b3ba5540
 md"""
-The most common derivative we use on a regular basis is probably 'speed', as in mile per hour, or $km/h$, which represents the distance, $x$, travailed with respect to time, $t$ which we write as $v = \dfrac{d x}{d t}$
+The most common derivative we use on a regular basis is probably 'speed', as in mile per hour, or $\mathrm{km}/\mathrm{h}$, which represents the distance, $x$, travailed with respect to time, $t$ which we write as $v = \dfrac{d x}{d t}$
 
 If we then take the change in speed over time, we get acceleration, $a = \dfrac{d u}{d t} = \dfrac{d \frac{d x}{dt}} {d t} = \dfrac{d^2 x}{d t^2}$, giving us the relationship between distance, velocity and acceleration.\
 \
@@ -78,11 +78,11 @@ md"""
 
 We can solve these kind of equations relatively easily on paper when we can obtain a nice and smooth analytical expression for the derivative, such as  
 
-$\dfrac{dx}{dt} = cos(t)$\
+$\dfrac{dx}{dt} = \cos(t)$\
 
 which has a know solutino in the sinusoidal function
 
-$x(t) = sin(t)$
+$x(t) = \sin(t)$
 
 However, in almost all the problems we deal with in the real world the expression on the right hand side of this equation is far more complicated and we simply have no way of solving it by hand.  For instance, returning to the driving example, in the real world we would have additional variables such as road slope, aerodynamic drag, and traffic effects. A more realistic model looks like
 
@@ -90,7 +90,7 @@ $\frac{du}{dt}
 = e(t)
 \;-\; g \sin\!\big(\theta(x(t))\big)
 \;-\; k\, u(t)^2
-\;-\; \frac{U_0}{1 + e^{-c\,(x(t) - x_0)}}$
+\;-\; \frac{U_0}{1 + \mathrm{e}^{-c\,(x(t) - x_0)}}$
 
 where $u(t)$ is the speed, $e(t)$ is the engine input accelerating the vehicle, $g$ is the gravitational acceleration, $\theta(x(t))$ is the slope of the road at a specific location $x(t)$, $ku(t)^2$ is the aerodynamic drag, and the last term on the right hand side is a sigmoid function used as a simplified model for the effect of traffic or congestion. 
 
@@ -220,7 +220,7 @@ md"""
 Lets try this method out using a function which we know the solution for, such as the previous example of a sinusoidal function.
 
 We define the differential equation as:\
-$\dfrac{dy(t)}{dt} = A cos(\omega t)$ \
+$\dfrac{dy(t)}{dt} = A \cos(\omega t)$ \
 
 where $t$ is time, $A$ is the amplitude of the oscillation and $\omega = \frac{2 \pi}{T}$ is the frequency converted from angles to radians (i.e. how many oscillations occur over a period of time) and $T$ is the period of the oscillations.
 
@@ -524,7 +524,7 @@ Lets try solving a different ODE now.  We will use the an exponentially decaying
 $\dfrac{d y(t)}{d t} = -y(t)$
 
 This function has the exact solution\
-$y(t) = y_0 e^{-t}$
+$y(t) = y_0 \mathrm{e}^{-t}$
 
 Lets write these functions in code and compare how our numerical differential equation solvers approximate it.  We will evaluate the functions from $t=0$ up to $t=20$ and set the initial condition to $1$, i.e. $y(t=0) = y_0 = 1$.
 
@@ -588,7 +588,7 @@ Lets go step by step with the two different Euler methods. With the Forward Eule
 With the backwards Euler, we use the slope at $t=1.33$, which happens to be $-y(1.33)$. We don't know the value yet, but we can find it by solving the equation
 $y_1 = y_0 + \Delta t \cdot -y_1 \Rightarrow y_1 = 1/2.33 = 0.4286$
 
-This is still an overestimate compared to the exact solution $y(1.33) = e^{-1.33} \approx 0.26$, but at least it's moving in the right direction and stays positive!
+This is still an overestimate compared to the exact solution $y(1.33) = \mathrm{e}^{-1.33} \approx 0.26$, but at least it's moving in the right direction and stays positive!
 
 If we take further steps like this with both methods, we'll see that the Forward Euler method oscillates up and down before eventually converging, while the Backward Euler method smoothly decays toward the solution without oscillations.
 
@@ -647,7 +647,7 @@ end;
 
 # ╔═╡ c33782d6-f281-48d0-8955-6d22da17af0f
 md"""
-Now lets define our parametes.  We set the mass to be 1kg for simplicity, and apply a sinusoidal force $a(t) = -sin(\omega t)$.
+Now lets define our parametes.  We set the mass to be 1kg for simplicity, and apply a sinusoidal force $a(t) = -\sin(\omega t)$.
 We also need to define the initial conditions. As we have two equations, each one of them requires a separate intial condition, one for the initial displacment, $x(t=0) = x_0$ and one for initial veolcity, $u(t=0) = u_0$.  We will set the initial displacement to zero, $x_0 = 0$, and the initial velocity to $u_0 = A / \omega$.  This arrangement describes what is know as a pure "harmonic oscillator".
 """
 
