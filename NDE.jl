@@ -811,9 +811,6 @@ Roots = "f2b01f46-fcfa-551c-844a-d8ac1e96c665"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 TikzPictures = "37f6aa50-8035-52d0-81c2-5a1d08754b2d"
 
-[sources]
-TikzPictures = {rev = "a195b17ac6c32527d647f61c192fbaa8e0a9ba33", url = "https://github.com/giordano/TikzPictures.jl"}
-
 [compat]
 LaTeXStrings = "~1.4.0"
 NLsolve = "~4.5.1"
@@ -2125,9 +2122,7 @@ version = "1.11.0"
 
 [[deps.TikzPictures]]
 deps = ["LaTeXStrings", "Poppler_jll", "tectonic_jll"]
-git-tree-sha1 = "c905d504e3a500e485d4e766dc7e67bb4761aed2"
-repo-rev = "a195b17ac6c32527d647f61c192fbaa8e0a9ba33"
-repo-url = "https://github.com/giordano/TikzPictures.jl"
+git-tree-sha1 = "875854f63fbe215b554390efd249bfbef1418c31"
 uuid = "37f6aa50-8035-52d0-81c2-5a1d08754b2d"
 version = "3.5.1"
 
