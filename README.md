@@ -61,12 +61,31 @@ Several options are provided for interacting with the notebooks:
 ```bash
 # Pull the pre-built image
 docker pull ghcr.io/ucl-arc/nde:main
-
-# Run the container
-docker run -p 1234:1234 ghcr.io/ucl-arc/nde:main
-
-# Open your browser to http://localhost:1234
 ```
+
+On macOS or Linux you can start the notebook inside the container with
+
+```bash
+docker run -p 1234:1234 -ti ghcr.io/ucl-arc/nde:main julia -e 'using Pluto; Pluto.run(; host="0.0.0.0", port=1234)'
+```
+
+or if using PowerShell on Windows with
+
+```powershell
+docker run -p 1234:1234 -ti ghcr.io/ucl-arc/nde:main julia -e 'using Pluto; Pluto.run(; host=""""0.0.0.0"""", port=1234)'
+```
+
+This will launch Pluto within the container, and if successful you should see a message similar to
+
+```
+[ Info: Loading...
+┌ Info:
+└ Go to http://0.0.0.0:1234/?secret=hgY7as1X in your browser to start writing ~ have fun!
+```
+
+where `hgY7as1X` in the URL will be replaced with another random alphanumeric string. The Pluto notebook environment is accessed as a web app, so you should open a browser window and navigate to the URL indicated in the message to open the Pluto interface. If you get `Unable to connect` message or similar when trying to open the URL, you may need to replace the `0.0.0.0` component with `localhost`, so for the example above you would navigate to `http://localhost:1234/?secret=hgY7as1X`. 
+
+Once you have the Pluto interface open in your browser, you will need to load the notebook saved at `/root/NDE.jl`. To open the notebook, find the `Open a 
 
 **Building Locally:**
 
