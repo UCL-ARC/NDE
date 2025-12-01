@@ -33,4 +33,5 @@ RUN . /julia_cpu_target.sh && julia --color=yes -e '\
 using Pkg;\
 using Pluto;\
 Pluto.activate_notebook_environment("/root/NDE.jl");\
+Pkg.Registry.update(); \
 Pkg.instantiate()'
